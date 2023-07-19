@@ -18,6 +18,9 @@ def copy_code(repo_dir):
     combined_code = '\n# Directory structure:\n'
 
     for root, dirs, files in os.walk(repo_dir):
+        # Exclude .git directory
+        if '.git' in dirs:
+            dirs.remove('.git')
 
         # Filter files using matches function
         files = [f for f in files if not matches(os.path.join(root, f))]
@@ -32,6 +35,10 @@ def copy_code(repo_dir):
 
     # Copy non-ignored python code
     for root, dirs, files in os.walk(repo_dir):
+        # Exclude .git directory
+        if '.git' in dirs:
+            dirs.remove('.git')
+
         files = [f for f in files if not matches(os.path.join(root, f))]
 
         for file in files:

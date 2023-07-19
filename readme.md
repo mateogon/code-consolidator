@@ -35,10 +35,12 @@ else:
 
 ### Walk directory tree
 
-The script recursively walks through the repository directory using `os.walk()` to traverse all subdirectories and files. It filters out the ignored files based on the matching function obtained from the `.gitignore` file.
+The script recursively walks through the repository directory using `os.walk()` to traverse all subdirectories and files. It filters out the ignored files based on the matching function obtained from the `.gitignore` file. It also ignores the `.git` folder entirely.
 
 ```python
 for root, dirs, files in os.walk(repo_dir):
+    if '.git' in dirs:
+      dirs.remove('.git')
     # Filter ignored files
     files = [f for f in files if not matches(os.path.join(root, f))]
 ```
