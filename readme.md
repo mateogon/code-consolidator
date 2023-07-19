@@ -2,6 +2,12 @@
 
 This script consolidates all code from a repository into a single combined file, facilitating the reading of the repository by artificial intelligence language models.
 
+## Installation
+
+```bash
+pip install gitignore_parser
+```
+
 ## Usage
 
 ```bash
