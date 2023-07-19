@@ -1,6 +1,6 @@
 # Repository Code Consolidator
 
-This script consolidates all Python code from a repository into a single combined file, facilitating the reading of the repository by artificial intelligence language models.
+This script consolidates all code from a repository into a single combined file, facilitating the reading of the repository by artificial intelligence language models.
 
 ## Usage
 
