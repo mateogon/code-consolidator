@@ -1,0 +1,925 @@
+
+# Directory structure:
+/
+leafs/
+    ChoppingVines.kt
+    UpdateLocation.kt
+    EatFood.kt
+    FletchLogs.kt
+    LightInitialFire.kt
+    Banking.kt
+    LightingBrazier.kt
+    OpenCrates.kt
+    OpenBank.kt
+    IdleInSafezone.kt
+    EnterArena.kt
+    ExitArena.kt
+    WalkToSafespot.kt
+    EquipGearIfUpgraded.kt
+branch/
+    InsideArena.kt
+    GameRunning.kt
+    OutsideArena.kt
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/ChoppingVines.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants.ACTION_CHOP
+import com.open.wintertodt.OpenWintertodtConstants.OBJECT_BRUMA_ROOT
+import com.open.wintertodt.Script
+import com.open.wintertodt.helpers.FoodHelper.needToEat
+import org.powbot.api.Condition
+import org.powbot.api.rt4.*
+import org.powbot.api.rt4.walking.local.LocalPathFinder
+import org.powbot.api.script.tree.Leaf
+
+class ChoppingVines(script: Script) : Leaf<Script>(script, "Chopping logs") {
+    override fun execute() {
+        if (Players.local().animation() != -1) {
+            return
+        }
+
+        val vine = getVines()
+
+        if (vine == GameObject.Nil) {
+            return
+        }
+
+        if (vine.inViewport()) {
+            if (vine.interact(ACTION_CHOP)) {
+                Condition.wait { Players.local().animation() != -1 || needToEat(script) }
+            }
+
+        } else {
+            walkToObject(vine)
+        }
+    }
+
+    private fun getVines(): GameObject {
+        return Objects.stream().name(OBJECT_BRUMA_ROOT)
+            .at(script.status.currentLocation.rootsTile).nearest().first()
+    }
+
+    private fun walkToObject(go: GameObject) {
+        val startingHp = Combat.health()
+        val targetTile = go.getWalkableNeighbours(false)
+        if (targetTile.isEmpty()) {
+            return
+        }
+        LocalPathFinder.findPath(targetTile.random())
+            .traverseUntilReached(3.0) { Combat.health() < startingHp }
+    }
+
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/UpdateLocation.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.Script
+import com.open.wintertodt.helpers.CommonMethods.isPyromancerDead
+import com.open.wintertodt.models.WintertodtLocation
+import org.powbot.api.Condition
+import org.powbot.api.rt4.Combat
+import org.powbot.api.script.tree.Leaf
+import java.util.logging.Logger
+
+class UpdateLocation(script: Script) : Leaf<Script>(script, "Checking for location update") {
+    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
+
+    override fun execute() {
+
+        // Give leeway to revive
+        val seStatus = isPyromancerDead(WintertodtLocation.SOUTH_EAST)
+        val swStatus = isPyromancerDead(WintertodtLocation.SOUTH_WEST)
+        val neStatus = isPyromancerDead(WintertodtLocation.NORTH_EAST)
+        val nwStatus = isPyromancerDead(WintertodtLocation.NORTH_WEST)
+
+        val hp = Combat.health()
+        val revive = Condition.wait({ !isPyromancerDead(script.status.currentLocation) || Combat.health() < hp}, 1500, 2)
+
+        if (revive) {
+            logger.info("Pyromancer revived, not changing location.")
+            return
+        }
+
+        logger.info("SW $swStatus., SE $seStatus, NW $nwStatus, NE $neStatus")
+        if (isAtRegion(WintertodtLocation.SOUTH_EAST)) {
+            script.status.currentLocation = if (!swStatus) {
+                WintertodtLocation.SOUTH_WEST
+            } else if (!neStatus) {
+                WintertodtLocation.NORTH_EAST
+            } else {
+                WintertodtLocation.NORTH_WEST
+            }
+        } else if (isAtRegion(WintertodtLocation.SOUTH_WEST)) {
+            script.status.currentLocation = if (!seStatus) {
+                WintertodtLocation.SOUTH_EAST
+            } else if (!nwStatus) {
+                WintertodtLocation.NORTH_WEST
+            } else {
+                WintertodtLocation.NORTH_EAST
+            }
+        } else if (isAtRegion(WintertodtLocation.NORTH_WEST)) {
+            script.status.currentLocation = if (!swStatus) {
+                WintertodtLocation.SOUTH_WEST
+            } else if (!seStatus) {
+                WintertodtLocation.SOUTH_EAST
+            } else {
+                WintertodtLocation.NORTH_EAST
+            }
+        } else {
+            script.status.currentLocation = if (!seStatus) {
+                WintertodtLocation.SOUTH_EAST
+            } else if (!swStatus) {
+                WintertodtLocation.SOUTH_WEST
+            } else {
+                WintertodtLocation.NORTH_WEST
+            }
+        }
+
+        logger.info("Updated location is ${script.status.currentLocation}")
+    }
+
+    private fun isAtRegion(location: WintertodtLocation): Boolean {
+        return script.status.currentLocation == location
+    }
+
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/EatFood.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.Script
+import com.open.wintertodt.helpers.FoodHelper
+import org.powbot.api.Condition
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.rt4.Item
+import org.powbot.api.rt4.Players
+import org.powbot.api.script.tree.Leaf
+
+class EatFood(script: Script) : Leaf<Script>(script, "Eating food") {
+    override fun execute() {
+        val firstFood = Inventory.stream().name(*FoodHelper.getFoodInformation(script.configuration.foodName))
+            .first()
+
+        if (firstFood != Item.Nil) {
+            val action = if (firstFood.actions().contains("Eat")) "Eat" else "Drink"
+            if (firstFood.interact(action) && Condition.wait({ Players.local().animation() != -1 }, 500, 3)) {
+                Condition.wait { !firstFood.valid() }
+            }
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/FletchLogs.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_KINDLING
+import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_ROOT
+import com.open.wintertodt.OpenWintertodtConstants.TOOL_KNIFE
+import com.open.wintertodt.Script
+import com.open.wintertodt.extensions.count
+import com.open.wintertodt.helpers.CommonMethods
+import com.open.wintertodt.helpers.InteractionsHelper
+import org.powbot.api.Condition
+import org.powbot.api.rt4.Chat
+import org.powbot.api.rt4.Combat
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.script.tree.Leaf
+import java.util.logging.Logger
+
+class FletchLogs(script: Script) : Leaf<Script>(script, "Fletching logs") {
+    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
+
+    override fun execute() {
+        if (Chat.chatting() && !Chat.completeChat()) {
+            logger.info("Exiting failed to chat")
+            return
+        }
+
+        val knife = Inventory.stream().name(TOOL_KNIFE).first()
+        val log = Inventory.stream().name(ITEM_BRUMA_ROOT).toList()
+        if (log.isEmpty()) {
+            logger.info("No logs found")
+            return
+        }
+
+        val useResult = InteractionsHelper.useItemOn(knife, log.first())
+        if (!useResult) {
+            logger.info("Failed to use item")
+            return
+        }
+
+        var currentLogCount = log.size
+        var kindlingCount: Int
+        val startingHp = Combat.health()
+        for (i in 0..log.size) {
+            var shouldExit = false
+            val result = Condition.wait({
+                val oldLogCount = currentLogCount
+
+                currentLogCount = Inventory.stream().name(ITEM_BRUMA_ROOT).count().toInt()
+                kindlingCount = Inventory.count(ITEM_BRUMA_KINDLING)
+
+                if (shouldExit(currentLogCount, kindlingCount, startingHp)) {
+                    shouldExit = true
+                    return@wait true
+                }
+
+                currentLogCount < oldLogCount || currentLogCount == 0
+            }, 500, 6)
+
+            if (shouldExit || !result) {
+                return
+            }
+        }
+    }
+
+    private fun shouldExit(logCount: Int, kindlingCount: Int, startingHp: Int): Boolean {
+        return CommonMethods.remainingHealthPercentage() <= logCount + kindlingCount || Chat.canContinue()
+                || Combat.health() < startingHp
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/LightInitialFire.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants.ACTION_LIGHT
+import com.open.wintertodt.OpenWintertodtConstants.OBJECT_BRAZIER
+import com.open.wintertodt.OpenWintertodtConstants.OBJECT_BURNING_BRAZIER
+import com.open.wintertodt.OpenWintertodtConstants.VARPBIT_RESPAWN
+import com.open.wintertodt.Script
+import com.open.wintertodt.extensions.Conditions
+import com.open.wintertodt.models.WintertodtLocation
+import org.powbot.api.Condition
+import org.powbot.api.Random
+import org.powbot.api.Tile
+import org.powbot.api.rt4.*
+import org.powbot.api.script.tree.Leaf
+
+class LightInitialFire(script: Script) : Leaf<Script>(script, "Light initial fire") {
+    private val currentLocation: WintertodtLocation get() = script.status.currentLocation
+
+    override fun execute() {
+        val brazierTile = currentLocation.brazierTile
+        if (Players.local().y() != currentLocation.brazierY || brazierTile.distanceTo(Players.local()) >= 2.5) {
+            val xPos = Random.nextInt(currentLocation.minBrazierX, currentLocation.maxBrazierX)
+            val tile = Tile(xPos, currentLocation.brazierY)
+            Movement.builder(tile).setWalkUntil { Players.local().y() == currentLocation.brazierY }.move()
+        }
+
+        if (brazierTile.distanceTo(Players.local()) <= 2.5 && shouldLightInitialFire()) {
+
+            val brazier = getBrazier()
+            if (brazier.interact(ACTION_LIGHT, Game.singleTapEnabled())) {
+                Condition.wait(Conditions.expGained(Constants.SKILLS_FIREMAKING))
+            }
+        }
+    }
+
+    private fun shouldLightInitialFire(): Boolean {
+        val ticksValue = Varpbits.varpbit(VARPBIT_RESPAWN)
+        return ticksValue <= 32768
+    }
+
+    private fun getBrazier(): GameObject {
+        return Objects.stream(currentLocation.brazierTile, 4, GameObject.Type.INTERACTIVE)
+            .name(OBJECT_BURNING_BRAZIER, OBJECT_BRAZIER)
+            .nearest()
+            .first()
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/Banking.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants
+import com.open.wintertodt.Script
+import org.powbot.api.Notifications
+import org.powbot.api.rt4.Bank
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.script.tree.Leaf
+import org.powbot.mobile.script.ScriptManager
+
+class Banking(script: Script) : Leaf<Script>(script, "Banking") {
+    override fun execute() {
+        val bankItem = Bank.stream().name(script.configuration.foodName).first()
+        val inventoryCount = Inventory.stream().name(script.configuration.foodName).count(true).toInt()
+        if (bankItem.stackSize() < script.configuration.foodCount - inventoryCount) {
+            Notifications.showNotification("Stopping script because out of food")
+            ScriptManager.stop()
+            return
+        }
+
+        if (Bank.depositAllExcept(
+                OpenWintertodtConstants.TOOL_KNIFE,
+                OpenWintertodtConstants.TOOL_TINBERBOX,
+                OpenWintertodtConstants.TOOL_HAMMER,
+                OpenWintertodtConstants.ITEM_BRONZE_AXE,
+                OpenWintertodtConstants.ITEM_IRON_AXE,
+                OpenWintertodtConstants.ITEM_STEEL_AXE,
+                OpenWintertodtConstants.ITEM_MITHRIL_AXE,
+                OpenWintertodtConstants.ITEM_ADAMANT_AXE,
+                OpenWintertodtConstants.ITEM_RUNE_AXE,
+                OpenWintertodtConstants.ITEM_DRAGON_AXE,
+                script.configuration.foodName
+            )
+        ) {
+            Bank.withdraw(script.configuration.foodName, (script.configuration.foodCount - inventoryCount))
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/LightingBrazier.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants
+import com.open.wintertodt.OpenWintertodtConstants.ACTION_FEED
+import com.open.wintertodt.OpenWintertodtConstants.ACTION_FIX
+import com.open.wintertodt.OpenWintertodtConstants.ACTION_LIGHT
+import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_KINDLING
+import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_ROOT
+import com.open.wintertodt.OpenWintertodtConstants.MESSAGES_BROKEN_EVENT
+import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_BROKEN
+import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_COLD
+import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_NO_BRUMA_ROOTS
+import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_OUT
+import com.open.wintertodt.Script
+import com.open.wintertodt.extensions.Conditions
+import com.open.wintertodt.extensions.count
+import com.open.wintertodt.helpers.MessageListener
+import com.open.wintertodt.helpers.SystemMessageManager
+import org.powbot.api.Condition
+import org.powbot.api.Random
+import org.powbot.api.Tile
+import org.powbot.api.rt4.*
+import org.powbot.api.script.tree.Leaf
+import java.util.logging.Logger
+
+class LightingBrazier(script: Script) : Leaf<Script>(script, "Lighting brazier") {
+    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
+
+    override fun execute() {
+        val brazier = getBrazier()
+        if (brazier == GameObject.Nil || !brazier.inViewport()) {
+            walkToBrazier()
+            return
+        }
+        lightBrazier(brazier)
+    }
+
+    private fun lightBrazier(brazier: GameObject) {
+        val action = getBrazierAction(brazier)
+        val distance = Players.local().tile().distanceTo(brazier.tile)
+        if (action != ACTION_FEED && distance > 2.5) {
+            walkToBrazier()
+            return
+        }
+
+        if (brazier.interact(action)) {
+            if (distance > 4) {
+                Condition.wait({ Players.local().inMotion() }, 50, 20)
+                Condition.wait({ !Players.local().inMotion() }, 100, 20)
+            }
+            val initialHp = Combat.health()
+
+            if (Condition.wait({ Combat.health() < initialHp || Players.local().animation() != -1 }, 100, 20)) {
+                when (action) {
+                    ACTION_FEED -> waitForLighting(initialHp)
+                    ACTION_FIX -> Condition.wait(Conditions.expGained(Constants.SKILLS_CONSTRUCTION))
+                    ACTION_LIGHT -> Condition.wait(Conditions.expGained(Constants.SKILLS_FIREMAKING))
+                }
+            }
+        }
+    }
+
+    private fun waitForLighting(startingHp: Int): Boolean {
+        val waitTimer = MessageListener(1, MESSAGES_BROKEN_EVENT, 120000)
+        SystemMessageManager.addMessageToListen(waitTimer)
+        val times = Inventory.count(ITEM_BRUMA_KINDLING, ITEM_BRUMA_ROOT)
+        for (i in 0..times) {
+            val exp = Skills.experience(Constants.SKILLS_FIREMAKING)
+
+            val success = Condition.wait(
+                {
+                    exp < Skills.experience(Constants.SKILLS_FIREMAKING) || waitTimer.count == 0
+                },
+                300,
+                12
+            )
+
+            if (waitTimer.count == 0 || Combat.health() < startingHp || !success) {
+                break
+            }
+        }
+        return true
+    }
+
+    private fun getBrazierAction(brazier: GameObject): String {
+        return when {
+            brazier.id() == 29313 -> ACTION_FIX
+            brazier.id() == 29312 -> ACTION_LIGHT
+            else -> ACTION_FEED
+        }
+    }
+
+    private fun getBrazier(): GameObject {
+        return Objects.stream(script.status.currentLocation.brazierTile, 4, GameObject.Type.INTERACTIVE)
+            .name(OpenWintertodtConstants.OBJECT_BURNING_BRAZIER, OpenWintertodtConstants.OBJECT_BRAZIER)
+            .nearest()
+            .first()
+    }
+
+    private fun walkToBrazier() {
+        val tile = Tile(
+            Random.nextInt(
+                script.status.currentLocation.minBrazierX,
+                script.status.currentLocation.maxBrazierX
+            ), script.status.currentLocation.brazierY
+        )
+        val result = Movement.builder(tile)
+            .setWalkUntil { tile.distance() < 2.5 && tile.matrix().inViewport() }
+            .move()
+
+        if (!result.success) {
+            logger.info("Success failed, ${result.failureReason}, Used web ${result.usedWeb}")
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/OpenCrates.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants
+import com.open.wintertodt.Script
+import com.open.wintertodt.extensions.count
+import org.powbot.api.Condition
+import org.powbot.api.Random
+import org.powbot.api.Tile
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.rt4.Movement
+import org.powbot.api.rt4.Players
+import org.powbot.api.script.tree.Leaf
+
+class OpenCrates(script: Script) : Leaf<Script>(script, "Opening crates") {
+    override fun execute() {
+        if (OpenWintertodtConstants.BANK_TODT.distanceTo(Players.local()) > 3 && Movement.destination() == Tile.Nil) {
+            Movement.step(OpenWintertodtConstants.BANK_TODT, 1)
+        }
+
+        Inventory.stream().name(OpenWintertodtConstants.ITEM_CRATE).forEach {
+            if (it.interact("Open")) {
+                Condition.sleep(Random.nextInt(400, 700))
+            }
+        }
+
+        Condition.wait({ Inventory.count(OpenWintertodtConstants.ITEM_CRATE) == 0 }, 5, 400)
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/OpenBank.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants.BANK_TODT
+import com.open.wintertodt.Script
+import com.open.wintertodt.extensions.nearestGameObject
+import org.powbot.api.Condition
+import org.powbot.api.rt4.Bank
+import org.powbot.api.rt4.Movement
+import org.powbot.api.rt4.Objects
+import org.powbot.api.rt4.Players
+import org.powbot.api.script.tree.Leaf
+
+class OpenBank(script: Script) : Leaf<Script>(script, "Opening bank") {
+    override fun execute() {
+        val bankChest = Objects.nearestGameObject("Bank chest")
+
+        if (bankChest.inViewport(true) && bankChest.interact("Bank")) {
+            Condition.wait ({ Players.local().inMotion() || Bank.opened() }, 500, 5)
+            Condition.wait({ !Players.local().inMotion() || Bank.opened() }, 500, 15)
+        } else {
+            Movement.builder(BANK_TODT)
+                .setWalkUntil { BANK_TODT.matrix().inViewport(true)}
+                .move()
+            if (BANK_TODT.distance() > 5 && !Players.local().inMotion()) {
+                Movement.step(BANK_TODT, 1)
+            }
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/IdleInSafezone.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants
+import com.open.wintertodt.OpenWintertodtConstants.AREA_NEAR_DOOR
+import com.open.wintertodt.Script
+import org.powbot.api.Condition
+import org.powbot.api.rt4.Movement
+import org.powbot.api.rt4.Players
+import org.powbot.api.rt4.Varpbits
+import org.powbot.api.script.tree.Leaf
+
+class IdleInSafezone(script: Script) : Leaf<Script>(script, "Idling in safe zone") {
+    override fun execute() {
+
+        if (AREA_NEAR_DOOR.contains(Players.local())) {
+            Condition.wait { Varpbits.varpbit(OpenWintertodtConstants.VARPBIT_RESPAWN) != 0 }
+        } else {
+            Movement.builder(AREA_NEAR_DOOR.randomTile)
+                .setWalkUntil { AREA_NEAR_DOOR.contains(Players.local()) ||
+                        Varpbits.varpbit(OpenWintertodtConstants.VARPBIT_RESPAWN) != 0 }
+                .move()
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/EnterArena.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants.ACTION_ENTER
+import com.open.wintertodt.OpenWintertodtConstants.AREA_INSIDE_ARENA
+import com.open.wintertodt.OpenWintertodtConstants.OBJECT_DOOR
+import com.open.wintertodt.OpenWintertodtConstants.TILE_NEAR_DOOR_OUTSIDE
+import com.open.wintertodt.Script
+import org.powbot.api.Condition
+import org.powbot.api.Tile
+import org.powbot.api.rt4.*
+import org.powbot.api.rt4.walking.local.LocalPathFinder
+import org.powbot.api.script.tree.Leaf
+
+class EnterArena(script: Script) : Leaf<Script>(script, "Entering arena") {
+    override fun execute() {
+        if (Bank.opened()) {
+            Bank.close()
+            return
+        }
+
+        val door = Objects.stream(20, GameObject.Type.INTERACTIVE).name(OBJECT_DOOR)
+            .first()
+
+        if (door == GameObject.Nil) {
+            Movement.builder(TILE_NEAR_DOOR_OUTSIDE)
+                .setWalkUntil { TILE_NEAR_DOOR_OUTSIDE.distance() < 2 }
+                .setRunMin(50)
+                .setRunMax(70)
+                .move()
+        } else {
+            walkToDoor(door)
+        }
+    }
+
+    private fun walkToDoor(door: GameObject) {
+        if (!door.inViewport() || door.tile.distance() >= 3) {
+            val targetTile = Tile(door.tile.x, 3520)
+            LocalPathFinder.findPath(targetTile)
+                .traverseUntilReached(3.0)
+        }
+
+        if (door.inViewport() && door.interact(ACTION_ENTER)) {
+            Condition.wait({ AREA_INSIDE_ARENA.contains(Players.local()) }, 1000, 10)
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/ExitArena.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants
+import com.open.wintertodt.OpenWintertodtConstants.ACTION_ENTER
+import com.open.wintertodt.OpenWintertodtConstants.AREA_INSIDE_ARENA
+import com.open.wintertodt.OpenWintertodtConstants.TILE_NEAR_DOOR_INSIDE
+import com.open.wintertodt.Script
+import org.powbot.api.Condition
+import org.powbot.api.Random
+import org.powbot.api.rt4.GameObject
+import org.powbot.api.rt4.Movement
+import org.powbot.api.rt4.Objects
+import org.powbot.api.rt4.Players
+import org.powbot.api.rt4.walking.local.LocalPathFinder
+import org.powbot.api.script.tree.Leaf
+
+class ExitArena(script: Script) : Leaf<Script>(script, "Exiting arena") {
+    override fun execute() {
+        val door = Objects.stream().type(GameObject.Type.INTERACTIVE).name(OpenWintertodtConstants.OBJECT_DOOR)
+            .first()
+
+        if (!door.inViewport() || door.tile.distance() >= 3) {
+            val randomTile = TILE_NEAR_DOOR_INSIDE.derive(Random.nextInt(-2, 2), 0)
+            if (randomTile.loaded()) {
+                LocalPathFinder.findPath(randomTile)
+                    .traverseUntilReached(3.0)
+            } else {
+                Movement.builder(randomTile)
+                    .setRunMin(5)
+                    .setRunMax(20)
+                    .move()
+            }
+        }
+
+        if (door.inViewport() && door.interact(ACTION_ENTER)) {
+            val outside = Condition.wait({ !AREA_INSIDE_ARENA.contains(Players.local()) }, 1000, 10)
+            if (outside){
+                // Random sleep outside since it gives a black fade which prevents anything being done.
+                Condition.sleep(Random.nextInt(1500, 3000))
+            }
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/WalkToSafespot.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.Script
+import com.open.wintertodt.models.WintertodtLocation
+import org.powbot.api.rt4.Movement
+import org.powbot.api.rt4.Players
+import org.powbot.api.script.tree.Leaf
+
+class WalkToSafespot(script: Script) : Leaf<Script>(script, "Walking to safespot") {
+    private val currentLocation: WintertodtLocation get() = script.status.currentLocation
+
+    override fun execute() {
+        Movement.builder(currentLocation.safespotTile)
+            .setWalkUntil { Players.local().tile() == currentLocation.safespotTile }
+            .move()
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/EquipGearIfUpgraded.kt
+package com.open.wintertodt.leafs
+
+import com.open.wintertodt.OpenWintertodtConstants
+import com.open.wintertodt.Script
+import org.powbot.api.Condition
+import org.powbot.api.rt4.Equipment
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.script.tree.Leaf
+import java.util.logging.Logger
+
+class EquipGearIfUpgraded(script: Script) : Leaf<Script>(script, "Upgrading gear") {
+    private val logger = Logger.getLogger(this.javaClass.name)
+
+    override fun execute() {
+        val equipment = Equipment.get()
+        val pyroInventory = Inventory.stream().name(*OpenWintertodtConstants.ITEMS_PYROMANCER).toList()
+
+        pyroInventory.forEach {
+            if (!equipment.any { eq -> eq.name() == it.name() }) {
+                logger.info("Attempting to equip ${it.name()}")
+                if (it.interact("Wear")) {
+                    Condition.wait { !it.valid() }
+                }
+            }
+        }
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/branch/InsideArena.kt
+package com.open.wintertodt.branch
+
+import com.open.wintertodt.OpenWintertodtConstants.AREA_INSIDE_ARENA
+import com.open.wintertodt.Script
+import com.open.wintertodt.helpers.FoodHelper
+import com.open.wintertodt.leafs.ExitArena
+import com.open.wintertodt.leafs.LightInitialFire
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.rt4.Players
+import org.powbot.api.script.tree.Branch
+import org.powbot.api.script.tree.TreeComponent
+
+class IsInside(script: Script) : Branch<Script>(script, "Is inside arena") {
+    override val successComponent: TreeComponent<Script> = IsGameRunning(script)
+    override val failedComponent: TreeComponent<Script> = HasFood(script)
+
+    override fun validate(): Boolean {
+        return AREA_INSIDE_ARENA.contains(Players.local())
+    }
+}
+
+class HasMinimumFood(script: Script) : Branch<Script>(script, "Has minimum food") {
+    override val successComponent: TreeComponent<Script> = LightInitialFire(script)
+    override val failedComponent: TreeComponent<Script> = ExitArena(script)
+
+    override fun validate(): Boolean {
+        return Inventory.stream().name(*FoodHelper.getFoodInformation(script.configuration.foodName)).count(true) >= script.configuration.minFoodCount
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/branch/GameRunning.kt
+package com.open.wintertodt.branch
+
+import com.open.wintertodt.OpenWintertodtConstants
+import com.open.wintertodt.OpenWintertodtConstants.AREA_NEAR_DOOR
+import com.open.wintertodt.OpenWintertodtConstants.ITEMS_USELESS
+import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_KINDLING
+import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_ROOT
+import com.open.wintertodt.Script
+import com.open.wintertodt.extensions.count
+import com.open.wintertodt.helpers.CommonMethods.isBrazierAlive
+import com.open.wintertodt.helpers.CommonMethods.isPyromancerDead
+import com.open.wintertodt.helpers.CommonMethods.remainingHealthPercentage
+import com.open.wintertodt.helpers.FoodHelper
+import com.open.wintertodt.helpers.PointHelper.getPointsContributed
+import com.open.wintertodt.leafs.*
+import org.powbot.api.Condition
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.rt4.Players
+import org.powbot.api.rt4.Varpbits
+import org.powbot.api.script.tree.Branch
+import org.powbot.api.script.tree.SimpleLeaf
+import org.powbot.api.script.tree.TreeComponent
+import java.util.logging.Logger
+
+// TODO Drop vials and jugs
+class IsGameRunning(script: Script) : Branch<Script>(script, "Is game running") {
+    override val successComponent: TreeComponent<Script> = ShouldIdleAtFiveHundred(script)
+    override val failedComponent: TreeComponent<Script> = HasMinimumFood(script)
+
+    override fun validate(): Boolean {
+        return Varpbits.varpbit(OpenWintertodtConstants.VARPBIT_RESPAWN) == 0
+    }
+}
+
+class ShouldIdleAtFiveHundred(script: Script) : Branch<Script>(script, "Should idle at 500") {
+    override val successComponent: TreeComponent<Script> = IdleInSafezone(script)
+    override val failedComponent: TreeComponent<Script> = NeedsToEat(script)
+
+    override fun validate(): Boolean {
+        return script.configuration.idleAtFiveHundred && getPointsContributed() >= 500
+    }
+}
+
+class NeedsToEat(script: Script) : Branch<Script>(script, "Needs to eat") {
+    override val successComponent: TreeComponent<Script> = HasFoodToEat(script)
+    override val failedComponent: TreeComponent<Script> = DropUselessItems(script)
+
+    override fun validate(): Boolean {
+        return FoodHelper.needToEat(script)
+    }
+}
+
+class DropUselessItems(script: Script) : Branch<Script>(script, "Drop useless items?") {
+    override val successComponent: TreeComponent<Script> = SimpleLeaf(script, "Dropping useless items") {
+        val items = Inventory.stream().name(*ITEMS_USELESS).toList()
+        items.forEach {
+            if (it.interact("Drop")) {
+                Condition.wait { !it.valid() }
+            }
+        }
+    }
+    override val failedComponent: TreeComponent<Script> = ShouldStayInSafeZone(script)
+
+    override fun validate(): Boolean {
+        return Inventory.count(*ITEMS_USELESS) > 0
+    }
+}
+
+class ShouldStayInSafeZone(script: Script) : Branch<Script>(script, "Is in safezone") {
+    override val successComponent: TreeComponent<Script> = IdleInSafezone(script)
+    override val failedComponent: TreeComponent<Script> = ShouldStartLightingInventory(script)
+
+    override fun validate(): Boolean {
+        return AREA_NEAR_DOOR.contains(Players.local()) && Inventory.stream()
+            .name(*FoodHelper.getFoodInformation(script.configuration.foodName))
+            .count() <= 0
+    }
+}
+
+class ShouldStartLightingInventory(script: Script) : Branch<Script>(script, "Lighting stuff") {
+
+    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
+
+    override val successComponent: TreeComponent<Script> = CanLightFire(script)
+    override val failedComponent: TreeComponent<Script> = ShouldWalkToSafespot(script)
+
+    // TODO Figure out how to split it better between different configurations without duplicate counts
+    override fun validate(): Boolean {
+        // If its fully crafted and fletching enabled
+        val kindlingCount = Inventory.count(ITEM_BRUMA_KINDLING)
+        val rootCount = Inventory.count(ITEM_BRUMA_ROOT)
+        val inventoryFull = Inventory.isFull()
+        var result = false
+        if (script.status.lighting && kindlingCount + rootCount > 0) {
+            result = true
+            logger.info("Lighting because has remaining")
+        } else if (inventoryFull && script.configuration.logsOnly) {
+            result = true
+            logger.info("Lighting because only logs")
+        } else if (inventoryFull && rootCount == 0) {
+            result = true
+            logger.info("Lighting full kindling")
+        } else if (rootCount == 0 && kindlingCount > 0) {
+            result = true
+            logger.info("Lighting since no logs to fletch")
+        } else if (rootCount + kindlingCount >= remainingHealthPercentage()) {
+            logger.info("Lighting because $rootCount, $kindlingCount, ${remainingHealthPercentage()}%")
+            result = true
+        }
+
+        return result.also { script.status.lighting = it }
+    }
+}
+
+class CanLightFire(script: Script) : Branch<Script>(script, "Can light fire") {
+
+    override val successComponent: TreeComponent<Script> = LightingBrazier(script)
+    override val failedComponent: TreeComponent<Script> = UpdateLocation(script)
+
+    override fun validate(): Boolean {
+        return isBrazierAlive(script.status.currentLocation) || !isPyromancerDead(script.status.currentLocation)
+    }
+
+}
+
+class ShouldWalkToSafespot(script: Script) : Branch<Script>(script, "Should walk to safespot") {
+    override val successComponent: TreeComponent<Script> = WalkToSafespot(script)
+    override val failedComponent: TreeComponent<Script> = ShouldChopVines(script)
+
+    override fun validate(): Boolean {
+        return script.configuration.snowfallSafespot &&
+                Players.local().tile() != script.status.currentLocation.safespotTile
+    }
+}
+
+class ShouldChopVines(script: Script) : Branch<Script>(script, "Should chop vines") {
+    override val successComponent: TreeComponent<Script> = ChoppingVines(script)
+    override val failedComponent: TreeComponent<Script> = FletchLogs(script)
+
+    override fun validate(): Boolean {
+        return !Inventory.isFull() && Inventory.count(ITEM_BRUMA_KINDLING) == 0
+    }
+}
+
+class HasFoodToEat(script: Script) : Branch<Script>(script, "Has food to eat") {
+    override val successComponent: TreeComponent<Script> = EatFood(script)
+    override val failedComponent: TreeComponent<Script> = IdleInSafezone(script)
+
+    override fun validate(): Boolean {
+        return Inventory.count(*FoodHelper.getFoodInformation(script.configuration.foodName)) > 0
+    }
+}
+
+#### file: /home/mateo/Desktop/OpenTodt-main/tree/branch/OutsideArena.kt
+package com.open.wintertodt.branch
+
+import com.open.wintertodt.OpenWintertodtConstants.ITEMS_PYROMANCER
+import com.open.wintertodt.OpenWintertodtConstants.ITEM_CRATE
+import com.open.wintertodt.Script
+import com.open.wintertodt.extensions.count
+import com.open.wintertodt.leafs.*
+import org.powbot.api.rt4.Bank
+import org.powbot.api.rt4.Equipment
+import org.powbot.api.rt4.Inventory
+import org.powbot.api.script.tree.Branch
+import org.powbot.api.script.tree.TreeComponent
+import java.util.logging.Logger
+
+class HasFood(script: Script) : Branch<Script>(script, "Has required food") {
+    override val successComponent: TreeComponent<Script> = EnterArena(script)
+    override val failedComponent: TreeComponent<Script> = IsBankOpened(script)
+
+    override fun validate(): Boolean {
+        return Inventory.stream().name(script.configuration.foodName).count(true) >= script.configuration.foodCount
+    }
+}
+
+class IsBankOpened(script: Script) : Branch<Script>(script, "Is bank opened") {
+    override val successComponent: TreeComponent<Script> = Banking(script)
+    override val failedComponent: TreeComponent<Script> = ShouldOpenCrates(script)
+
+    override fun validate(): Boolean {
+        return Bank.opened()
+    }
+}
+
+class ShouldOpenCrates(script: Script) : Branch<Script>(script, "Open crates?") {
+    override val successComponent: TreeComponent<Script> = OpenCrates(script)
+    override val failedComponent: TreeComponent<Script> = HasGearToEquip(script)
+
+    override fun validate(): Boolean {
+        return script.configuration.openCrates && Inventory.count(ITEM_CRATE) > 0
+    }
+}
+
+class HasGearToEquip(script: Script) : Branch<Script>(script, "Has gear to equip?") {
+    override val successComponent: TreeComponent<Script> = EquipGearIfUpgraded(script)
+    override val failedComponent: TreeComponent<Script> = OpenBank(script)
+
+    override fun validate(): Boolean {
+        if (!script.configuration.upgradeGear) {
+            return false
+        }
+
+        val equipment = Equipment.get()
+        val pyroInventory = Inventory.stream().name(*ITEMS_PYROMANCER).toList()
+
+        pyroInventory.forEach {
+            if (!equipment.any { eq -> eq.name() == it.name() }) {
+                return true
+            }
+        }
+        return false
+    }
+}
+

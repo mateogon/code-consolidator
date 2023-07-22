@@ -12,7 +12,7 @@ def copy_code(repo_dir):
         matches = parse_gitignore(gitignore)
     else:
         print('.gitignore not found, skipping ignore checks')
-        matches = None
+        def matches(s): return False
 
     # Print directory tree
     combined_files = '\n# Directory structure:\n'
