@@ -1,6 +1,6 @@
 # Repository Code Consolidator
 
-This Python script provides a unified way to gather all the code from a repository into a singular text file. This feature aims to provide an easy, digestible format for artificial intelligence language models to analyze repository content.
+This Python script provides a unified way to gather all the code from a repository into a singular text file. It also allows the user to specify a list of specific files to be included in the output. This feature aims to provide an easy, digestible format for artificial intelligence language models to analyze repository content.
 
 ## Getting Started
 
@@ -17,10 +17,12 @@ pip install gitignore_parser
 Here's how you use this script:
 
 ```bash
-python consolidate.py <repo_dir> <mode>
+python consolidate.py <repo_dir> <mode> [--file_list <file_list>]
 ```
 
 This command will create a text file named `combined_files.txt` that contains the repository's code content based on the specified mode ('tree', 'code', or 'both').
+
+If the `--file_list` argument is provided with a path to a text file, only the files listed in this text file will be included in the 'code' portion of the output. Each line in this file should be a path to a file in the repository, relative to the repository directory.
 
 ## How It Works
 
@@ -52,8 +54,10 @@ Depending on the specified mode, the script either:
 - Copies the content of the files (in 'code' mode),
 - Or does both (in 'both' mode).
 
+If a file list is provided, only the files in this list will be included in the 'code' portion of the output.
+
 ```python
-combined_files = consolidate_code(repo_path, args.mode)
+combined_files = consolidate_code(repo_path, args.mode, file_list_path=args.file_list)
 ```
 
 ### Saving Output
