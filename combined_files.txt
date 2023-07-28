@@ -1,925 +1,1218 @@
-
-# Directory structure:
-/
-leafs/
-    ChoppingVines.kt
-    UpdateLocation.kt
-    EatFood.kt
-    FletchLogs.kt
-    LightInitialFire.kt
-    Banking.kt
-    LightingBrazier.kt
-    OpenCrates.kt
-    OpenBank.kt
-    IdleInSafezone.kt
-    EnterArena.kt
-    ExitArena.kt
-    WalkToSafespot.kt
-    EquipGearIfUpgraded.kt
-branch/
-    InsideArena.kt
-    GameRunning.kt
-    OutsideArena.kt
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/ChoppingVines.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants.ACTION_CHOP
-import com.open.wintertodt.OpenWintertodtConstants.OBJECT_BRUMA_ROOT
-import com.open.wintertodt.Script
-import com.open.wintertodt.helpers.FoodHelper.needToEat
-import org.powbot.api.Condition
-import org.powbot.api.rt4.*
-import org.powbot.api.rt4.walking.local.LocalPathFinder
-import org.powbot.api.script.tree.Leaf
-
-class ChoppingVines(script: Script) : Leaf<Script>(script, "Chopping logs") {
-    override fun execute() {
-        if (Players.local().animation() != -1) {
-            return
-        }
-
-        val vine = getVines()
-
-        if (vine == GameObject.Nil) {
-            return
-        }
-
-        if (vine.inViewport()) {
-            if (vine.interact(ACTION_CHOP)) {
-                Condition.wait { Players.local().animation() != -1 || needToEat(script) }
-            }
-
-        } else {
-            walkToObject(vine)
-        }
-    }
-
-    private fun getVines(): GameObject {
-        return Objects.stream().name(OBJECT_BRUMA_ROOT)
-            .at(script.status.currentLocation.rootsTile).nearest().first()
-    }
-
-    private fun walkToObject(go: GameObject) {
-        val startingHp = Combat.health()
-        val targetTile = go.getWalkableNeighbours(false)
-        if (targetTile.isEmpty()) {
-            return
-        }
-        LocalPathFinder.findPath(targetTile.random())
-            .traverseUntilReached(3.0) { Combat.health() < startingHp }
-    }
-
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/UpdateLocation.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.Script
-import com.open.wintertodt.helpers.CommonMethods.isPyromancerDead
-import com.open.wintertodt.models.WintertodtLocation
-import org.powbot.api.Condition
-import org.powbot.api.rt4.Combat
-import org.powbot.api.script.tree.Leaf
-import java.util.logging.Logger
-
-class UpdateLocation(script: Script) : Leaf<Script>(script, "Checking for location update") {
-    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
-
-    override fun execute() {
-
-        // Give leeway to revive
-        val seStatus = isPyromancerDead(WintertodtLocation.SOUTH_EAST)
-        val swStatus = isPyromancerDead(WintertodtLocation.SOUTH_WEST)
-        val neStatus = isPyromancerDead(WintertodtLocation.NORTH_EAST)
-        val nwStatus = isPyromancerDead(WintertodtLocation.NORTH_WEST)
-
-        val hp = Combat.health()
-        val revive = Condition.wait({ !isPyromancerDead(script.status.currentLocation) || Combat.health() < hp}, 1500, 2)
-
-        if (revive) {
-            logger.info("Pyromancer revived, not changing location.")
-            return
-        }
-
-        logger.info("SW $swStatus., SE $seStatus, NW $nwStatus, NE $neStatus")
-        if (isAtRegion(WintertodtLocation.SOUTH_EAST)) {
-            script.status.currentLocation = if (!swStatus) {
-                WintertodtLocation.SOUTH_WEST
-            } else if (!neStatus) {
-                WintertodtLocation.NORTH_EAST
-            } else {
-                WintertodtLocation.NORTH_WEST
-            }
-        } else if (isAtRegion(WintertodtLocation.SOUTH_WEST)) {
-            script.status.currentLocation = if (!seStatus) {
-                WintertodtLocation.SOUTH_EAST
-            } else if (!nwStatus) {
-                WintertodtLocation.NORTH_WEST
-            } else {
-                WintertodtLocation.NORTH_EAST
-            }
-        } else if (isAtRegion(WintertodtLocation.NORTH_WEST)) {
-            script.status.currentLocation = if (!swStatus) {
-                WintertodtLocation.SOUTH_WEST
-            } else if (!seStatus) {
-                WintertodtLocation.SOUTH_EAST
-            } else {
-                WintertodtLocation.NORTH_EAST
-            }
-        } else {
-            script.status.currentLocation = if (!seStatus) {
-                WintertodtLocation.SOUTH_EAST
-            } else if (!swStatus) {
-                WintertodtLocation.SOUTH_WEST
-            } else {
-                WintertodtLocation.NORTH_WEST
-            }
-        }
-
-        logger.info("Updated location is ${script.status.currentLocation}")
-    }
-
-    private fun isAtRegion(location: WintertodtLocation): Boolean {
-        return script.status.currentLocation == location
-    }
-
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/EatFood.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.Script
-import com.open.wintertodt.helpers.FoodHelper
-import org.powbot.api.Condition
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.rt4.Item
-import org.powbot.api.rt4.Players
-import org.powbot.api.script.tree.Leaf
-
-class EatFood(script: Script) : Leaf<Script>(script, "Eating food") {
-    override fun execute() {
-        val firstFood = Inventory.stream().name(*FoodHelper.getFoodInformation(script.configuration.foodName))
-            .first()
-
-        if (firstFood != Item.Nil) {
-            val action = if (firstFood.actions().contains("Eat")) "Eat" else "Drink"
-            if (firstFood.interact(action) && Condition.wait({ Players.local().animation() != -1 }, 500, 3)) {
-                Condition.wait { !firstFood.valid() }
-            }
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/FletchLogs.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_KINDLING
-import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_ROOT
-import com.open.wintertodt.OpenWintertodtConstants.TOOL_KNIFE
-import com.open.wintertodt.Script
-import com.open.wintertodt.extensions.count
-import com.open.wintertodt.helpers.CommonMethods
-import com.open.wintertodt.helpers.InteractionsHelper
-import org.powbot.api.Condition
-import org.powbot.api.rt4.Chat
-import org.powbot.api.rt4.Combat
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.script.tree.Leaf
-import java.util.logging.Logger
-
-class FletchLogs(script: Script) : Leaf<Script>(script, "Fletching logs") {
-    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
-
-    override fun execute() {
-        if (Chat.chatting() && !Chat.completeChat()) {
-            logger.info("Exiting failed to chat")
-            return
-        }
-
-        val knife = Inventory.stream().name(TOOL_KNIFE).first()
-        val log = Inventory.stream().name(ITEM_BRUMA_ROOT).toList()
-        if (log.isEmpty()) {
-            logger.info("No logs found")
-            return
-        }
-
-        val useResult = InteractionsHelper.useItemOn(knife, log.first())
-        if (!useResult) {
-            logger.info("Failed to use item")
-            return
-        }
-
-        var currentLogCount = log.size
-        var kindlingCount: Int
-        val startingHp = Combat.health()
-        for (i in 0..log.size) {
-            var shouldExit = false
-            val result = Condition.wait({
-                val oldLogCount = currentLogCount
-
-                currentLogCount = Inventory.stream().name(ITEM_BRUMA_ROOT).count().toInt()
-                kindlingCount = Inventory.count(ITEM_BRUMA_KINDLING)
-
-                if (shouldExit(currentLogCount, kindlingCount, startingHp)) {
-                    shouldExit = true
-                    return@wait true
-                }
-
-                currentLogCount < oldLogCount || currentLogCount == 0
-            }, 500, 6)
-
-            if (shouldExit || !result) {
-                return
-            }
-        }
-    }
-
-    private fun shouldExit(logCount: Int, kindlingCount: Int, startingHp: Int): Boolean {
-        return CommonMethods.remainingHealthPercentage() <= logCount + kindlingCount || Chat.canContinue()
-                || Combat.health() < startingHp
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/LightInitialFire.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants.ACTION_LIGHT
-import com.open.wintertodt.OpenWintertodtConstants.OBJECT_BRAZIER
-import com.open.wintertodt.OpenWintertodtConstants.OBJECT_BURNING_BRAZIER
-import com.open.wintertodt.OpenWintertodtConstants.VARPBIT_RESPAWN
-import com.open.wintertodt.Script
-import com.open.wintertodt.extensions.Conditions
-import com.open.wintertodt.models.WintertodtLocation
-import org.powbot.api.Condition
-import org.powbot.api.Random
-import org.powbot.api.Tile
-import org.powbot.api.rt4.*
-import org.powbot.api.script.tree.Leaf
-
-class LightInitialFire(script: Script) : Leaf<Script>(script, "Light initial fire") {
-    private val currentLocation: WintertodtLocation get() = script.status.currentLocation
-
-    override fun execute() {
-        val brazierTile = currentLocation.brazierTile
-        if (Players.local().y() != currentLocation.brazierY || brazierTile.distanceTo(Players.local()) >= 2.5) {
-            val xPos = Random.nextInt(currentLocation.minBrazierX, currentLocation.maxBrazierX)
-            val tile = Tile(xPos, currentLocation.brazierY)
-            Movement.builder(tile).setWalkUntil { Players.local().y() == currentLocation.brazierY }.move()
-        }
-
-        if (brazierTile.distanceTo(Players.local()) <= 2.5 && shouldLightInitialFire()) {
-
-            val brazier = getBrazier()
-            if (brazier.interact(ACTION_LIGHT, Game.singleTapEnabled())) {
-                Condition.wait(Conditions.expGained(Constants.SKILLS_FIREMAKING))
-            }
-        }
-    }
-
-    private fun shouldLightInitialFire(): Boolean {
-        val ticksValue = Varpbits.varpbit(VARPBIT_RESPAWN)
-        return ticksValue <= 32768
-    }
-
-    private fun getBrazier(): GameObject {
-        return Objects.stream(currentLocation.brazierTile, 4, GameObject.Type.INTERACTIVE)
-            .name(OBJECT_BURNING_BRAZIER, OBJECT_BRAZIER)
-            .nearest()
-            .first()
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/Banking.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants
-import com.open.wintertodt.Script
-import org.powbot.api.Notifications
-import org.powbot.api.rt4.Bank
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.script.tree.Leaf
-import org.powbot.mobile.script.ScriptManager
-
-class Banking(script: Script) : Leaf<Script>(script, "Banking") {
-    override fun execute() {
-        val bankItem = Bank.stream().name(script.configuration.foodName).first()
-        val inventoryCount = Inventory.stream().name(script.configuration.foodName).count(true).toInt()
-        if (bankItem.stackSize() < script.configuration.foodCount - inventoryCount) {
-            Notifications.showNotification("Stopping script because out of food")
-            ScriptManager.stop()
-            return
-        }
-
-        if (Bank.depositAllExcept(
-                OpenWintertodtConstants.TOOL_KNIFE,
-                OpenWintertodtConstants.TOOL_TINBERBOX,
-                OpenWintertodtConstants.TOOL_HAMMER,
-                OpenWintertodtConstants.ITEM_BRONZE_AXE,
-                OpenWintertodtConstants.ITEM_IRON_AXE,
-                OpenWintertodtConstants.ITEM_STEEL_AXE,
-                OpenWintertodtConstants.ITEM_MITHRIL_AXE,
-                OpenWintertodtConstants.ITEM_ADAMANT_AXE,
-                OpenWintertodtConstants.ITEM_RUNE_AXE,
-                OpenWintertodtConstants.ITEM_DRAGON_AXE,
-                script.configuration.foodName
-            )
-        ) {
-            Bank.withdraw(script.configuration.foodName, (script.configuration.foodCount - inventoryCount))
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/LightingBrazier.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants
-import com.open.wintertodt.OpenWintertodtConstants.ACTION_FEED
-import com.open.wintertodt.OpenWintertodtConstants.ACTION_FIX
-import com.open.wintertodt.OpenWintertodtConstants.ACTION_LIGHT
-import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_KINDLING
-import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_ROOT
-import com.open.wintertodt.OpenWintertodtConstants.MESSAGES_BROKEN_EVENT
-import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_BROKEN
-import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_COLD
-import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_NO_BRUMA_ROOTS
-import com.open.wintertodt.OpenWintertodtConstants.MESSAGE_OUT
-import com.open.wintertodt.Script
-import com.open.wintertodt.extensions.Conditions
-import com.open.wintertodt.extensions.count
-import com.open.wintertodt.helpers.MessageListener
-import com.open.wintertodt.helpers.SystemMessageManager
-import org.powbot.api.Condition
-import org.powbot.api.Random
-import org.powbot.api.Tile
-import org.powbot.api.rt4.*
-import org.powbot.api.script.tree.Leaf
-import java.util.logging.Logger
-
-class LightingBrazier(script: Script) : Leaf<Script>(script, "Lighting brazier") {
-    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
-
-    override fun execute() {
-        val brazier = getBrazier()
-        if (brazier == GameObject.Nil || !brazier.inViewport()) {
-            walkToBrazier()
-            return
-        }
-        lightBrazier(brazier)
-    }
-
-    private fun lightBrazier(brazier: GameObject) {
-        val action = getBrazierAction(brazier)
-        val distance = Players.local().tile().distanceTo(brazier.tile)
-        if (action != ACTION_FEED && distance > 2.5) {
-            walkToBrazier()
-            return
-        }
-
-        if (brazier.interact(action)) {
-            if (distance > 4) {
-                Condition.wait({ Players.local().inMotion() }, 50, 20)
-                Condition.wait({ !Players.local().inMotion() }, 100, 20)
-            }
-            val initialHp = Combat.health()
-
-            if (Condition.wait({ Combat.health() < initialHp || Players.local().animation() != -1 }, 100, 20)) {
-                when (action) {
-                    ACTION_FEED -> waitForLighting(initialHp)
-                    ACTION_FIX -> Condition.wait(Conditions.expGained(Constants.SKILLS_CONSTRUCTION))
-                    ACTION_LIGHT -> Condition.wait(Conditions.expGained(Constants.SKILLS_FIREMAKING))
-                }
-            }
-        }
-    }
-
-    private fun waitForLighting(startingHp: Int): Boolean {
-        val waitTimer = MessageListener(1, MESSAGES_BROKEN_EVENT, 120000)
-        SystemMessageManager.addMessageToListen(waitTimer)
-        val times = Inventory.count(ITEM_BRUMA_KINDLING, ITEM_BRUMA_ROOT)
-        for (i in 0..times) {
-            val exp = Skills.experience(Constants.SKILLS_FIREMAKING)
-
-            val success = Condition.wait(
-                {
-                    exp < Skills.experience(Constants.SKILLS_FIREMAKING) || waitTimer.count == 0
-                },
-                300,
-                12
-            )
-
-            if (waitTimer.count == 0 || Combat.health() < startingHp || !success) {
-                break
-            }
-        }
-        return true
-    }
-
-    private fun getBrazierAction(brazier: GameObject): String {
-        return when {
-            brazier.id() == 29313 -> ACTION_FIX
-            brazier.id() == 29312 -> ACTION_LIGHT
-            else -> ACTION_FEED
-        }
-    }
-
-    private fun getBrazier(): GameObject {
-        return Objects.stream(script.status.currentLocation.brazierTile, 4, GameObject.Type.INTERACTIVE)
-            .name(OpenWintertodtConstants.OBJECT_BURNING_BRAZIER, OpenWintertodtConstants.OBJECT_BRAZIER)
-            .nearest()
-            .first()
-    }
-
-    private fun walkToBrazier() {
-        val tile = Tile(
-            Random.nextInt(
-                script.status.currentLocation.minBrazierX,
-                script.status.currentLocation.maxBrazierX
-            ), script.status.currentLocation.brazierY
-        )
-        val result = Movement.builder(tile)
-            .setWalkUntil { tile.distance() < 2.5 && tile.matrix().inViewport() }
-            .move()
-
-        if (!result.success) {
-            logger.info("Success failed, ${result.failureReason}, Used web ${result.usedWeb}")
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/OpenCrates.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants
-import com.open.wintertodt.Script
-import com.open.wintertodt.extensions.count
-import org.powbot.api.Condition
-import org.powbot.api.Random
-import org.powbot.api.Tile
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.rt4.Movement
-import org.powbot.api.rt4.Players
-import org.powbot.api.script.tree.Leaf
-
-class OpenCrates(script: Script) : Leaf<Script>(script, "Opening crates") {
-    override fun execute() {
-        if (OpenWintertodtConstants.BANK_TODT.distanceTo(Players.local()) > 3 && Movement.destination() == Tile.Nil) {
-            Movement.step(OpenWintertodtConstants.BANK_TODT, 1)
-        }
-
-        Inventory.stream().name(OpenWintertodtConstants.ITEM_CRATE).forEach {
-            if (it.interact("Open")) {
-                Condition.sleep(Random.nextInt(400, 700))
-            }
-        }
-
-        Condition.wait({ Inventory.count(OpenWintertodtConstants.ITEM_CRATE) == 0 }, 5, 400)
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/OpenBank.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants.BANK_TODT
-import com.open.wintertodt.Script
-import com.open.wintertodt.extensions.nearestGameObject
-import org.powbot.api.Condition
-import org.powbot.api.rt4.Bank
-import org.powbot.api.rt4.Movement
-import org.powbot.api.rt4.Objects
-import org.powbot.api.rt4.Players
-import org.powbot.api.script.tree.Leaf
-
-class OpenBank(script: Script) : Leaf<Script>(script, "Opening bank") {
-    override fun execute() {
-        val bankChest = Objects.nearestGameObject("Bank chest")
-
-        if (bankChest.inViewport(true) && bankChest.interact("Bank")) {
-            Condition.wait ({ Players.local().inMotion() || Bank.opened() }, 500, 5)
-            Condition.wait({ !Players.local().inMotion() || Bank.opened() }, 500, 15)
-        } else {
-            Movement.builder(BANK_TODT)
-                .setWalkUntil { BANK_TODT.matrix().inViewport(true)}
-                .move()
-            if (BANK_TODT.distance() > 5 && !Players.local().inMotion()) {
-                Movement.step(BANK_TODT, 1)
-            }
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/IdleInSafezone.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants
-import com.open.wintertodt.OpenWintertodtConstants.AREA_NEAR_DOOR
-import com.open.wintertodt.Script
-import org.powbot.api.Condition
-import org.powbot.api.rt4.Movement
-import org.powbot.api.rt4.Players
-import org.powbot.api.rt4.Varpbits
-import org.powbot.api.script.tree.Leaf
-
-class IdleInSafezone(script: Script) : Leaf<Script>(script, "Idling in safe zone") {
-    override fun execute() {
-
-        if (AREA_NEAR_DOOR.contains(Players.local())) {
-            Condition.wait { Varpbits.varpbit(OpenWintertodtConstants.VARPBIT_RESPAWN) != 0 }
-        } else {
-            Movement.builder(AREA_NEAR_DOOR.randomTile)
-                .setWalkUntil { AREA_NEAR_DOOR.contains(Players.local()) ||
-                        Varpbits.varpbit(OpenWintertodtConstants.VARPBIT_RESPAWN) != 0 }
-                .move()
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/EnterArena.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants.ACTION_ENTER
-import com.open.wintertodt.OpenWintertodtConstants.AREA_INSIDE_ARENA
-import com.open.wintertodt.OpenWintertodtConstants.OBJECT_DOOR
-import com.open.wintertodt.OpenWintertodtConstants.TILE_NEAR_DOOR_OUTSIDE
-import com.open.wintertodt.Script
-import org.powbot.api.Condition
-import org.powbot.api.Tile
-import org.powbot.api.rt4.*
-import org.powbot.api.rt4.walking.local.LocalPathFinder
-import org.powbot.api.script.tree.Leaf
-
-class EnterArena(script: Script) : Leaf<Script>(script, "Entering arena") {
-    override fun execute() {
-        if (Bank.opened()) {
-            Bank.close()
-            return
-        }
-
-        val door = Objects.stream(20, GameObject.Type.INTERACTIVE).name(OBJECT_DOOR)
-            .first()
-
-        if (door == GameObject.Nil) {
-            Movement.builder(TILE_NEAR_DOOR_OUTSIDE)
-                .setWalkUntil { TILE_NEAR_DOOR_OUTSIDE.distance() < 2 }
-                .setRunMin(50)
-                .setRunMax(70)
-                .move()
-        } else {
-            walkToDoor(door)
-        }
-    }
-
-    private fun walkToDoor(door: GameObject) {
-        if (!door.inViewport() || door.tile.distance() >= 3) {
-            val targetTile = Tile(door.tile.x, 3520)
-            LocalPathFinder.findPath(targetTile)
-                .traverseUntilReached(3.0)
-        }
-
-        if (door.inViewport() && door.interact(ACTION_ENTER)) {
-            Condition.wait({ AREA_INSIDE_ARENA.contains(Players.local()) }, 1000, 10)
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/ExitArena.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants
-import com.open.wintertodt.OpenWintertodtConstants.ACTION_ENTER
-import com.open.wintertodt.OpenWintertodtConstants.AREA_INSIDE_ARENA
-import com.open.wintertodt.OpenWintertodtConstants.TILE_NEAR_DOOR_INSIDE
-import com.open.wintertodt.Script
-import org.powbot.api.Condition
-import org.powbot.api.Random
-import org.powbot.api.rt4.GameObject
-import org.powbot.api.rt4.Movement
-import org.powbot.api.rt4.Objects
-import org.powbot.api.rt4.Players
-import org.powbot.api.rt4.walking.local.LocalPathFinder
-import org.powbot.api.script.tree.Leaf
-
-class ExitArena(script: Script) : Leaf<Script>(script, "Exiting arena") {
-    override fun execute() {
-        val door = Objects.stream().type(GameObject.Type.INTERACTIVE).name(OpenWintertodtConstants.OBJECT_DOOR)
-            .first()
-
-        if (!door.inViewport() || door.tile.distance() >= 3) {
-            val randomTile = TILE_NEAR_DOOR_INSIDE.derive(Random.nextInt(-2, 2), 0)
-            if (randomTile.loaded()) {
-                LocalPathFinder.findPath(randomTile)
-                    .traverseUntilReached(3.0)
-            } else {
-                Movement.builder(randomTile)
-                    .setRunMin(5)
-                    .setRunMax(20)
-                    .move()
-            }
-        }
-
-        if (door.inViewport() && door.interact(ACTION_ENTER)) {
-            val outside = Condition.wait({ !AREA_INSIDE_ARENA.contains(Players.local()) }, 1000, 10)
-            if (outside){
-                // Random sleep outside since it gives a black fade which prevents anything being done.
-                Condition.sleep(Random.nextInt(1500, 3000))
-            }
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/WalkToSafespot.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.Script
-import com.open.wintertodt.models.WintertodtLocation
-import org.powbot.api.rt4.Movement
-import org.powbot.api.rt4.Players
-import org.powbot.api.script.tree.Leaf
-
-class WalkToSafespot(script: Script) : Leaf<Script>(script, "Walking to safespot") {
-    private val currentLocation: WintertodtLocation get() = script.status.currentLocation
-
-    override fun execute() {
-        Movement.builder(currentLocation.safespotTile)
-            .setWalkUntil { Players.local().tile() == currentLocation.safespotTile }
-            .move()
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/leafs/EquipGearIfUpgraded.kt
-package com.open.wintertodt.leafs
-
-import com.open.wintertodt.OpenWintertodtConstants
-import com.open.wintertodt.Script
-import org.powbot.api.Condition
-import org.powbot.api.rt4.Equipment
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.script.tree.Leaf
-import java.util.logging.Logger
-
-class EquipGearIfUpgraded(script: Script) : Leaf<Script>(script, "Upgrading gear") {
-    private val logger = Logger.getLogger(this.javaClass.name)
-
-    override fun execute() {
-        val equipment = Equipment.get()
-        val pyroInventory = Inventory.stream().name(*OpenWintertodtConstants.ITEMS_PYROMANCER).toList()
-
-        pyroInventory.forEach {
-            if (!equipment.any { eq -> eq.name() == it.name() }) {
-                logger.info("Attempting to equip ${it.name()}")
-                if (it.interact("Wear")) {
-                    Condition.wait { !it.valid() }
-                }
-            }
-        }
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/branch/InsideArena.kt
-package com.open.wintertodt.branch
-
-import com.open.wintertodt.OpenWintertodtConstants.AREA_INSIDE_ARENA
-import com.open.wintertodt.Script
-import com.open.wintertodt.helpers.FoodHelper
-import com.open.wintertodt.leafs.ExitArena
-import com.open.wintertodt.leafs.LightInitialFire
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.rt4.Players
-import org.powbot.api.script.tree.Branch
-import org.powbot.api.script.tree.TreeComponent
-
-class IsInside(script: Script) : Branch<Script>(script, "Is inside arena") {
-    override val successComponent: TreeComponent<Script> = IsGameRunning(script)
-    override val failedComponent: TreeComponent<Script> = HasFood(script)
-
-    override fun validate(): Boolean {
-        return AREA_INSIDE_ARENA.contains(Players.local())
-    }
-}
-
-class HasMinimumFood(script: Script) : Branch<Script>(script, "Has minimum food") {
-    override val successComponent: TreeComponent<Script> = LightInitialFire(script)
-    override val failedComponent: TreeComponent<Script> = ExitArena(script)
-
-    override fun validate(): Boolean {
-        return Inventory.stream().name(*FoodHelper.getFoodInformation(script.configuration.foodName)).count(true) >= script.configuration.minFoodCount
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/branch/GameRunning.kt
-package com.open.wintertodt.branch
-
-import com.open.wintertodt.OpenWintertodtConstants
-import com.open.wintertodt.OpenWintertodtConstants.AREA_NEAR_DOOR
-import com.open.wintertodt.OpenWintertodtConstants.ITEMS_USELESS
-import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_KINDLING
-import com.open.wintertodt.OpenWintertodtConstants.ITEM_BRUMA_ROOT
-import com.open.wintertodt.Script
-import com.open.wintertodt.extensions.count
-import com.open.wintertodt.helpers.CommonMethods.isBrazierAlive
-import com.open.wintertodt.helpers.CommonMethods.isPyromancerDead
-import com.open.wintertodt.helpers.CommonMethods.remainingHealthPercentage
-import com.open.wintertodt.helpers.FoodHelper
-import com.open.wintertodt.helpers.PointHelper.getPointsContributed
-import com.open.wintertodt.leafs.*
-import org.powbot.api.Condition
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.rt4.Players
-import org.powbot.api.rt4.Varpbits
-import org.powbot.api.script.tree.Branch
-import org.powbot.api.script.tree.SimpleLeaf
-import org.powbot.api.script.tree.TreeComponent
-import java.util.logging.Logger
-
-// TODO Drop vials and jugs
-class IsGameRunning(script: Script) : Branch<Script>(script, "Is game running") {
-    override val successComponent: TreeComponent<Script> = ShouldIdleAtFiveHundred(script)
-    override val failedComponent: TreeComponent<Script> = HasMinimumFood(script)
-
-    override fun validate(): Boolean {
-        return Varpbits.varpbit(OpenWintertodtConstants.VARPBIT_RESPAWN) == 0
-    }
-}
-
-class ShouldIdleAtFiveHundred(script: Script) : Branch<Script>(script, "Should idle at 500") {
-    override val successComponent: TreeComponent<Script> = IdleInSafezone(script)
-    override val failedComponent: TreeComponent<Script> = NeedsToEat(script)
-
-    override fun validate(): Boolean {
-        return script.configuration.idleAtFiveHundred && getPointsContributed() >= 500
-    }
-}
-
-class NeedsToEat(script: Script) : Branch<Script>(script, "Needs to eat") {
-    override val successComponent: TreeComponent<Script> = HasFoodToEat(script)
-    override val failedComponent: TreeComponent<Script> = DropUselessItems(script)
-
-    override fun validate(): Boolean {
-        return FoodHelper.needToEat(script)
-    }
-}
-
-class DropUselessItems(script: Script) : Branch<Script>(script, "Drop useless items?") {
-    override val successComponent: TreeComponent<Script> = SimpleLeaf(script, "Dropping useless items") {
-        val items = Inventory.stream().name(*ITEMS_USELESS).toList()
-        items.forEach {
-            if (it.interact("Drop")) {
-                Condition.wait { !it.valid() }
-            }
-        }
-    }
-    override val failedComponent: TreeComponent<Script> = ShouldStayInSafeZone(script)
-
-    override fun validate(): Boolean {
-        return Inventory.count(*ITEMS_USELESS) > 0
-    }
-}
-
-class ShouldStayInSafeZone(script: Script) : Branch<Script>(script, "Is in safezone") {
-    override val successComponent: TreeComponent<Script> = IdleInSafezone(script)
-    override val failedComponent: TreeComponent<Script> = ShouldStartLightingInventory(script)
-
-    override fun validate(): Boolean {
-        return AREA_NEAR_DOOR.contains(Players.local()) && Inventory.stream()
-            .name(*FoodHelper.getFoodInformation(script.configuration.foodName))
-            .count() <= 0
-    }
-}
-
-class ShouldStartLightingInventory(script: Script) : Branch<Script>(script, "Lighting stuff") {
-
-    private var logger: Logger = Logger.getLogger(this.javaClass.simpleName)
-
-    override val successComponent: TreeComponent<Script> = CanLightFire(script)
-    override val failedComponent: TreeComponent<Script> = ShouldWalkToSafespot(script)
-
-    // TODO Figure out how to split it better between different configurations without duplicate counts
-    override fun validate(): Boolean {
-        // If its fully crafted and fletching enabled
-        val kindlingCount = Inventory.count(ITEM_BRUMA_KINDLING)
-        val rootCount = Inventory.count(ITEM_BRUMA_ROOT)
-        val inventoryFull = Inventory.isFull()
-        var result = false
-        if (script.status.lighting && kindlingCount + rootCount > 0) {
-            result = true
-            logger.info("Lighting because has remaining")
-        } else if (inventoryFull && script.configuration.logsOnly) {
-            result = true
-            logger.info("Lighting because only logs")
-        } else if (inventoryFull && rootCount == 0) {
-            result = true
-            logger.info("Lighting full kindling")
-        } else if (rootCount == 0 && kindlingCount > 0) {
-            result = true
-            logger.info("Lighting since no logs to fletch")
-        } else if (rootCount + kindlingCount >= remainingHealthPercentage()) {
-            logger.info("Lighting because $rootCount, $kindlingCount, ${remainingHealthPercentage()}%")
-            result = true
-        }
-
-        return result.also { script.status.lighting = it }
-    }
-}
-
-class CanLightFire(script: Script) : Branch<Script>(script, "Can light fire") {
-
-    override val successComponent: TreeComponent<Script> = LightingBrazier(script)
-    override val failedComponent: TreeComponent<Script> = UpdateLocation(script)
-
-    override fun validate(): Boolean {
-        return isBrazierAlive(script.status.currentLocation) || !isPyromancerDead(script.status.currentLocation)
-    }
-
-}
-
-class ShouldWalkToSafespot(script: Script) : Branch<Script>(script, "Should walk to safespot") {
-    override val successComponent: TreeComponent<Script> = WalkToSafespot(script)
-    override val failedComponent: TreeComponent<Script> = ShouldChopVines(script)
-
-    override fun validate(): Boolean {
-        return script.configuration.snowfallSafespot &&
-                Players.local().tile() != script.status.currentLocation.safespotTile
-    }
-}
-
-class ShouldChopVines(script: Script) : Branch<Script>(script, "Should chop vines") {
-    override val successComponent: TreeComponent<Script> = ChoppingVines(script)
-    override val failedComponent: TreeComponent<Script> = FletchLogs(script)
-
-    override fun validate(): Boolean {
-        return !Inventory.isFull() && Inventory.count(ITEM_BRUMA_KINDLING) == 0
-    }
-}
-
-class HasFoodToEat(script: Script) : Branch<Script>(script, "Has food to eat") {
-    override val successComponent: TreeComponent<Script> = EatFood(script)
-    override val failedComponent: TreeComponent<Script> = IdleInSafezone(script)
-
-    override fun validate(): Boolean {
-        return Inventory.count(*FoodHelper.getFoodInformation(script.configuration.foodName)) > 0
-    }
-}
-
-#### file: /home/mateo/Desktop/OpenTodt-main/tree/branch/OutsideArena.kt
-package com.open.wintertodt.branch
-
-import com.open.wintertodt.OpenWintertodtConstants.ITEMS_PYROMANCER
-import com.open.wintertodt.OpenWintertodtConstants.ITEM_CRATE
-import com.open.wintertodt.Script
-import com.open.wintertodt.extensions.count
-import com.open.wintertodt.leafs.*
-import org.powbot.api.rt4.Bank
-import org.powbot.api.rt4.Equipment
-import org.powbot.api.rt4.Inventory
-import org.powbot.api.script.tree.Branch
-import org.powbot.api.script.tree.TreeComponent
-import java.util.logging.Logger
-
-class HasFood(script: Script) : Branch<Script>(script, "Has required food") {
-    override val successComponent: TreeComponent<Script> = EnterArena(script)
-    override val failedComponent: TreeComponent<Script> = IsBankOpened(script)
-
-    override fun validate(): Boolean {
-        return Inventory.stream().name(script.configuration.foodName).count(true) >= script.configuration.foodCount
-    }
-}
-
-class IsBankOpened(script: Script) : Branch<Script>(script, "Is bank opened") {
-    override val successComponent: TreeComponent<Script> = Banking(script)
-    override val failedComponent: TreeComponent<Script> = ShouldOpenCrates(script)
-
-    override fun validate(): Boolean {
-        return Bank.opened()
-    }
-}
-
-class ShouldOpenCrates(script: Script) : Branch<Script>(script, "Open crates?") {
-    override val successComponent: TreeComponent<Script> = OpenCrates(script)
-    override val failedComponent: TreeComponent<Script> = HasGearToEquip(script)
-
-    override fun validate(): Boolean {
-        return script.configuration.openCrates && Inventory.count(ITEM_CRATE) > 0
-    }
-}
-
-class HasGearToEquip(script: Script) : Branch<Script>(script, "Has gear to equip?") {
-    override val successComponent: TreeComponent<Script> = EquipGearIfUpgraded(script)
-    override val failedComponent: TreeComponent<Script> = OpenBank(script)
-
-    override fun validate(): Boolean {
-        if (!script.configuration.upgradeGear) {
-            return false
-        }
-
-        val equipment = Equipment.get()
-        val pyroInventory = Inventory.stream().name(*ITEMS_PYROMANCER).toList()
-
-        pyroInventory.forEach {
-            if (!equipment.any { eq -> eq.name() == it.name() }) {
-                return true
-            }
-        }
-        return false
-    }
-}
-
+NegaWatt
+    default
+    files
+    negawatt.sql
+    nginx.conf
+    package-lock.json
+    package.json
+    README.md
+    backend
+        app.js
+        config.env
+        config.js
+        docs_install_dev.md
+        docs_prod.md
+        docs_tecnico.md
+        negagestion.service
+        package-lock.json
+        package.json
+        README.md
+        _config.yml
+        controllers
+            actividadesController.js
+            authController.js
+            auxController.js
+            calendarioController.js
+            capacitacionesController.js
+            dashboardController.js
+            fileController.js
+            indicadoresController.js
+            mailController.js
+            medicionController.js
+            moduleController.js
+            objetivosController.js
+            organizacionController.js
+            sessionController.js
+            tokenMiddleware.js
+            userController.js
+        jobs
+            index.js
+            package-lock.json
+            package.json
+        routes
+            database.js
+            Routes.js
+        utils
+            apiFeatures.js
+            appError.js
+            authorize.js
+            email.js
+            template.ejs
+            validateData.js
+            validateUniqueEmail.js
+    frontend
+        .env
+        description.html
+        jsconfig.json
+        package-lock.json
+        package.json
+        README.md
+        yarn.lock
+        docs
+            authentication.html
+            breadcrumb.html
+            dependencies.html
+            empty-page.html
+            gulpfile.js
+            index.html
+            layout.html
+            navigation.html
+            package-lock.json
+            package.json
+            routing.html
+            structure.html
+            assets
+                css
+                    doc.css
+                    doc.min.css
+                js
+                    es5
+                        doc.js
+                        doc.min.js
+                        header.js
+                        header.min.js
+                        sidebar.js
+                        sidebar.min.js
+                    main
+                        doc.js
+                        header.js
+                        sidebar.js
+                sass
+                    doc.scss
+                styles
+                    css
+                        done
+                            done.css
+                            done.min.css
+                    sass
+                        done
+                            done.scss
+                            _reboot.scss
+                            components
+                                _accordions.scss
+                                _alerts.scss
+                                _avatar.scss
+                                _badge.scss
+                                _bootstrap-select.scss
+                                _bootstrap-slider.scss
+                                _breadcrumb.scss
+                                _button.scss
+                                _card.scss
+                                _carousel.scss
+                                _collapse.scss
+                                _components.scss
+                                _dropdown.scss
+                                _icon.scss
+                                _input.scss
+                                _list.scss
+                                _lists.scss
+                                _modal.scss
+                                _nav.scss
+                                _navbar.scss
+                                _pagination.scss
+                                _popover.scss
+                                _pricing.scss
+                                _progress.scss
+                                _tab.scss
+                                _upload.scss
+                            functions
+                                _color.function.scss
+                                _functions.scss
+                                _shadow.function.scss
+                            mixins
+                                _animation.scss
+                                _badge.scss
+                                _border.scss
+                                _buttons.scss
+                                _card.scss
+                                _dropdown.scss
+                                _hover.scss
+                                _icons.scss
+                                _inputs.scss
+                                _mixins.scss
+                                _nav.scss
+                                _responsive.scss
+                                _shadow.scss
+                            sections
+                                _demo.scss
+                                _header-animated.scss
+                                _sections.scss
+                            utilities
+                                _border.scss
+                                _colors.scss
+                                _height-width.scss
+                                _shadow.scss
+                                _spacing.scss
+                                _typography.scss
+                                _utilities.scss
+                            variables
+                                _alert.scss
+                                _animation.scss
+                                _base.scss
+                                _bootstrap-select.scss
+                                _border.scss
+                                _breadcrumb.scss
+                                _buttons.scss
+                                _cards.scss
+                                _colors.scss
+                                _icon.scss
+                                _inputs.scss
+                                _nav.scss
+                                _navbar.scss
+                                _pagination.scss
+                                _progress.scss
+                                _shadows.scss
+                                _spacing.scss
+                                _typography.scss
+                                _variables.scss
+                                _z-index.scss
+                vendor
+                    clipboard.min.js
+                    feather.min.js
+                    jquery-3.4.1.min.js
+                    bootstrap
+                        css
+                            bootstrap-grid.css
+                            bootstrap-grid.css.map
+                            bootstrap-grid.min.css
+                            bootstrap-grid.min.css.map
+                            bootstrap-reboot.css
+                            bootstrap-reboot.css.map
+                            bootstrap-reboot.min.css
+                            bootstrap-reboot.min.css.map
+                            bootstrap.css
+                            bootstrap.css.map
+                            bootstrap.min.css
+                            bootstrap.min.css.map
+                        js
+                            bootstrap.bundle.js
+                            bootstrap.bundle.js.map
+                            bootstrap.bundle.min.js
+                            bootstrap.bundle.min.js.map
+                            bootstrap.js
+                            bootstrap.js.map
+                            bootstrap.min.js
+                            bootstrap.min.js.map
+        public
+            favicon.ico
+            index.html
+            logo192.png
+            logo512.png
+            manifest.json
+            robots.txt
+            assets
+                images
+                    Angular_Icon.png
+                    bg-1.png
+                    bootstrap-logo.png
+                    checkmark.svg
+                    close.svg
+                    danger.svg
+                    gull-large-sidebar.png
+                    Html_Icon.png
+                    info.svg
+                    laravel-logo.png
+                    logo-black.png
+                    logo-text.png
+                    logo-white.png
+                    logo.png
+                    mac_book.jpg
+                    master-card.png
+                    page-bg-bottom.png
+                    paypal.png
+                    photo-long-1.jpg
+                    photo-long-2.jpg
+                    photo-long-3.jpg
+                    photo-long-4.jpg
+                    photo-wide-1.jpg
+                    photo-wide-2.jpg
+                    photo-wide-3.jpg
+                    photo-wide-4.jpg
+                    photo-wide-5.jpeg
+                    ps.png
+                    Sass_icon.png
+                    visa.png
+                    faces
+                        1.jpg
+                        10.jpg
+                        12.jpg
+                        13.jpg
+                        15.jpg
+                        16.jpg
+                        17.jpg
+                        2.jpg
+                        3.jpg
+                        4.jpg
+                        5.jpg
+                        9.jpg
+                        face-1.jpg
+                        face-2.jpg
+                        face-3.jpg
+                        face-4.jpg
+                        face-5.jpg
+                        face-6.jpg
+                        face-7.jpg
+                    products
+                        cloud-346710_1280.png
+                        headphone-1.jpg
+                        headphone-2.jpg
+                        headphone-3.jpg
+                        headphone-4.jpg
+                        iphone-1.jpg
+                        iphone-2.jpg
+                        speaker-1.jpg
+                        speaker-2.jpg
+                        watch-1.jpg
+                        watch-2.jpg
+                        weather-2.jpg
+                        weather.jpg
+                    screenshots
+                        02_preview.png
+                        04_preview.png
+                        dashboard.v1.png
+                        dashboard.v2.png
+        src
+            @history.js
+            @utils.js
+            App.test.js
+            index.jsx
+            index.scss
+            logo.svg
+            serviceWorker.js
+            @gull
+                index.js
+                components
+                    Breadcrumb.jsx
+                    CodeViewer.jsx
+                    DropDownMenu.jsx
+                    DropDownMenuItem.jsx
+                    GullSearch.jsx
+                    GullTooltip.jsx
+                    MegaMenu.jsx
+                    RichTextEditor.jsx
+                    accordions
+                        RightArrowAccordion.jsx
+                    badges
+                        OutlinedBadge.jsx
+                    buttons
+                        LoadingButton.jsx
+                    cards
+                        SimpleCard.jsx
+                    charts
+                        EchartCreator.jsx
+                        EchartOptions.jsx
+                        RechartCreator.jsx
+                    GullLoadable
+                        GullLoadable.jsx
+                        Loading.js
+                    GullSidenav
+                        GullSidenav.jsx
+                        GullSidenavContainer.jsx
+                        GullSidenavContent.jsx
+                theme
+                    EchartTheme.jsx
+            app
+                App.jsx
+                appContext.js
+                backend.js
+                navigations.js
+                RootRoutes.jsx
+                auth
+                    Auth.jsx
+                    AuthGuard.jsx
+                    authRoles.js
+                GullLayout
+                    GullLayout.jsx
+                    index.js
+                    settings.js
+                    Layout1
+                        Layout1.jsx
+                        Layout1Header.jsx
+                        Layout1Settings.js
+                        Layout1Sidenav.jsx
+                    Layout2
+                        Layout2.jsx
+                        Layout2Header.jsx
+                        Layout2Settings.js
+                        Layout2Sidenav.jsx
+                    Layout3
+                        Layout3.jsx
+                        Layout3Header.jsx
+                        Layout3Settings.js
+                        Layout3Sidenav.jsx
+                    SharedComponents
+                        Customizer.jsx
+                        Footer.jsx
+                redux
+                    Store.js
+                    actions
+                        EcommerceActions.js
+                        LayoutActions.js
+                        LoginActions.js
+                        NotificationActions.js
+                        ScrumBoardActions.js
+                        UserActions.js
+                    reducers
+                        EcommerceReducer.js
+                        LayoutReducer.js
+                        LoginReducer.js
+                        NotificationReducer.js
+                        RootReducer.js
+                        ScrumBoardReducer.js
+                        UserReducer.js
+                services
+                    AuthService.js
+                    jwtAuthService.js
+                    localStorageService.js
+                    firebase
+                        firebaseAuthService.js
+                        firebaseConfig.js
+                views
+                    app
+                        actividades
+                            Actividades.jsx
+                            partials
+                                CambiarEstadoInstancia.jsx
+                                FormActividad.jsx
+                                FormCrearInstancia.jsx
+                                GestionarPeriodo.jsx
+                                GestionarPeriodos.jsx
+                                styles.css
+                                TablaActividades.jsx
+                        calendar
+                            AppCalendar.jsx
+                            CalendarEventDialog.jsx
+                            calendarRoutes.js
+                            CalendarService.js
+                        calendario
+                            Calendario.jsx
+                        capacitaciones
+                            Capacitaciones.jsx
+                            partials
+                                CambiarEstadoInstancia.jsx
+                                FormCapacitacion.jsx
+                                FormCrearInstancia.jsx
+                                GestionarPeriodo.jsx
+                                GestionarPeriodos.jsx
+                                styles.css
+                                TablaCapacitaciones.jsx
+                        chat
+                            AppChat.jsx
+                            ChatContainer.jsx
+                            chatRoutes.js
+                            chatService.js
+                            ChatSidenav.jsx
+                            EmptyMessage.jsx
+                        contact
+                            AccionCrear.jsx
+                            AccionEditar.jsx
+                            AnexoConf.jsx
+                            AnexoDoc.jsx
+                            AnexoRef.jsx
+                            ArchivoEditar.jsx
+                            ArchivoNCEditar.jsx
+                            CerrarNC.jsx
+                            ConformidadCrear.jsx
+                            ConformidadEditar.jsx
+                            Conformidadv2.jsx
+                            ContactCard.jsx
+                            ContactDetails.jsx
+                            ContactEditor.jsx
+                            ContactEditor2.jsx
+                            ContactList.jsx
+                            contactRoutes.js
+                            contactService.js
+                            ContactTable.jsx
+                            CrudTable.jsx
+                            Descarga.jsx
+                            DocRef.jsx
+                            Documentosv2.jsx
+                            Documetos.jsx
+                            Dowload.jsx
+                            FormikCheckboxGroup.jsx
+                            GestorEditor.jsx
+                            GestorEditor2.jsx
+                            Gestores.jsx
+                            HistorialConf.jsx
+                            HistorialDoc.jsx
+                            HistorialRegistro.jsx
+                            ListadoMaestro.jsx
+                            ListadoNC.jsx
+                            ListaGestor.jsx
+                            ListaGestorAdd.jsx
+                            maestro.jsx
+                            MemberEditorDialog.jsx
+                            OrganizacionEditor.jsx
+                            Organizaciones.jsx
+                            Permisos.jsx
+                            proceService.js
+                            Registros.jsx
+                            Registrosv2.jsx
+                            regService.js
+                            Responsables.jsx
+                            Sedes.jsx
+                            SelectSite.jsx
+                            Sitios.jsx
+                            SitiosEditor.jsx
+                            SitiosEditor2.jsx
+                            VerModificar.jsx
+                            _ListadoMaestro.jsx
+                            Gestor
+                                GestorForm.jsx
+                        dashboard-sitio
+                            DashboardSitio.jsx
+                            style.css
+                        ecommerce
+                            Cart.jsx
+                            Checkout.jsx
+                            ecommerceRoutes.js
+                            ProductDetails.jsx
+                            ProductList.jsx
+                        inbox
+                            AppInbox.jsx
+                            InboxComposeDialog.jsx
+                            InboxContent.jsx
+                            inboxRoutes.js
+                            inboxService.js
+                            InboxSidenav.jsx
+                        indicadores
+                            Indicadores.jsx
+                            style.css
+                            partials
+                                FormIndicador.jsx
+                                Indicador.jsx
+                        invoice
+                            InvoiceDetails.jsx
+                            InvoiceEditor.jsx
+                            InvoiceList.jsx
+                            invoiceRoutes.js
+                            InvoiceService.js
+                            InvoiceViewer.jsx
+                            NW_codigos_color.pdf
+                            SimpleTableCreator.jsx
+                        medicion-y-verificacion
+                            ClonarE.jsx
+                            CrearEnergetico.jsx
+                            CrearSGE.jsx
+                            EditarSGE.jsx
+                            EnergeticoEditar.jsx
+                            EnergeticoFechas.jsx
+                            medicion.css
+                            Medicion.jsx
+                            proceService.js
+                            SGEFechas.jsx
+                        objetivos-y-metas
+                            ObjetivosYMetas.jsx
+                            partials
+                                FieldValorActual.jsx
+                                FormObjetivo.jsx
+                                FormValorActual.jsx
+                                style.css
+                                TablaObjetivos.jsx
+                        task-manager
+                            TaskManager.jsx
+                            TaskManagerList.jsx
+                            taskManagerRoutes.js
+                            todo
+                                AppTodo.jsx
+                                TagDialog.jsx
+                                TodoEditor.jsx
+                                TodoItem.jsx
+                                TodoList.jsx
+                                todoRoutes.js
+                                todoService.js
+                        utils
+                            FieldsAdjunto.jsx
+                            FormikCalendarField.jsx
+                            FormikCheckboxGroup.jsx
+                            FormikCheckboxOnly.jsx
+                            FormikFieldValidation.jsx
+                            FormikFocusErrorHook.jsx
+                            FormikSelectValidation.jsx
+                            FormikSelectValidationData.jsx
+                            FormikSwitchField.jsx
+                            FormSubirAdjunto.jsx
+                            IconButton.jsx
+                            IconOverlay.jsx
+                            LineEllipsisTooltip.jsx
+                            ListaAdjuntos.jsx
+                            SwalConfirmDelete.jsx
+                    charts
+                        chartsRoute.js
+                        apex
+                            ApexAreaChart.jsx
+                            apexAreaChartOptions.js
+                            ApexBarChart.jsx
+                            apexBarChartOptions.js
+                            ApexBubbleChart.jsx
+                            apexBubbleChartOptions.js
+                            apexCandleStickChartOptions.js
+                            ApexColumnChart.jsx
+                            apexColumnChartOptions.js
+                            ApexDoughnutChart.jsx
+                            apexDoughnutChartOptions.js
+                            ApexLineChart.jsx
+                            apexLineChartOptions.js
+                            ApexMixChart.jsx
+                            apexMixChartOptions.js
+                            ApexRadarChart.jsx
+                            apexRadarChartOptions.js
+                            ApexRadialBarChart.jsx
+                            apexRadialBarChartOptions.js
+                            ApexScatterChart.jsx
+                            apexScatterChartOption.js
+                            ApexSparkLineChart.jsx
+                            apexSparkLineOptions.js
+                            dataSeries.js
+                        echarts
+                            AppEchart.jsx
+                            AreaChart.jsx
+                            ComparisonChart.jsx
+                            Doughnut.jsx
+                            echartOptions.js
+                            LineChart1.jsx
+                            LineChart2.jsx
+                            LineChart3.jsx
+                            LineChart4.jsx
+                            PieChart.jsx
+                        react-vis
+                            AppReactVis.jsx
+                            BigBaseBarSeries.jsx
+                            ColoredLineChart.jsx
+                            ContourData.js
+                            ContourSeries.jsx
+                            LabelledHeatMap.jsx
+                            VisAreaChart.jsx
+                            VisBarChart.jsx
+                            VisLineChart.jsx
+                        recharts
+                            AppRechart.jsx
+                            LineBarAreaComposedChart.jsx
+                            SimpleBarChart.jsx
+                            SimpleLineChart.jsx
+                            SimpleRadarChart.jsx
+                            SimpleRadialBar.jsx
+                            SimpleScatterChart.jsx
+                            SimpleTreeMap.jsx
+                            StackedAreaChart.jsx
+                            TwoSimplePieChart.jsx
+                        victory-charts
+                            AlternativeEvents.jsx
+                            AppVictoryChart.jsx
+                            CircularProgressBar.jsx
+                            CustomTooltipLabelChart.jsx
+                            RadarChart.jsx
+                            StackedPolarBar.jsx
+                            VictoryAreaAnimation.jsx
+                    dashboard
+                        dashboardRoutes.js
+                        dashboard1
+                            Dashboard1.jsx
+                        dashboard2
+                            Dashboard2.jsx
+                    dataTable
+                        AppDataTable.jsx
+                        BasicDataTable.jsx
+                        CellEditorDataTable.jsx
+                        dataTableRoute.js
+                        DefaultSortedDataTable.jsx
+                        MultiColumnOrderingDataTable.jsx
+                        SearchableDataTable.jsx
+                    extra-kits
+                        AppDropdown.jsx
+                        AppImageCropper.jsx
+                        AppLoader.jsx
+                        AppSweetAlert.jsx
+                        AppToastr.jsx
+                        AppTour.jsx
+                        extraKitsRoutes.js
+                        LaddaButtons.jsx
+                        UploadForm.jsx
+                    forms
+                        ActionBarForm.jsx
+                        Actualizar.jsx
+                        CargarIYR.jsx
+                        CargarNC.jsx
+                        CustomTagInput.jsx
+                        FormBasic.jsx
+                        FormBasic2.jsx
+                        FormEditor.jsx
+                        formsRoutes.js
+                        FormsWizard.jsx
+                        FormValidation.jsx
+                        FormWizardNav.jsx
+                        InfArch.jsx
+                        InputGroupForm.jsx
+                        LayoutForm.jsx
+                        Modificar.jsx
+                        ModificarIYR.jsx
+                        ModificarModal.jsx
+                        MultiColumnForms.jsx
+                        Registro.jsx
+                        richEditorContent.js
+                        SubirDYP.jsx
+                        SubirIYR.jsx
+                        SubirNC.jsx
+                        TagInput.jsx
+                    icons
+                        AppIcon.jsx
+                        iconsMind.js
+                        iconsRoutes.js
+                    pages
+                        BlankPage.jsx
+                        FAQ.jsx
+                        pagesRoutes.js
+                        PricingTable.jsx
+                        SearchResults.jsx
+                        UserProfile.jsx
+                    sessions
+                        Error.jsx
+                        ForgotPassword.jsx
+                        sessionsRoutes.js
+                        Signin.jsx
+                        Signup.jsx
+                    ui-kits
+                        uiKitsRoutes.js
+                        accordions
+                            AppAccordion.jsx
+                            CustomAccordin.jsx
+                            IconAccordin.jsx
+                            IconlessAccordin.jsx
+                            RightArrowLessAccordin.jsx
+                            SimpleAccordion.jsx
+                        alerts
+                            AppAlert.jsx
+                            DangerAlert.jsx
+                            SimpleAlert.jsx
+                            SuccessAlert.jsx
+                        badges
+                            AppBadge.jsx
+                        buttons
+                            AppButton.jsx
+                        card-metrics
+                            CardMetrics.jsx
+                            Echart1.jsx
+                            Echart10.jsx
+                            Echart2.jsx
+                            Echart3.jsx
+                            Echart4.jsx
+                            Echart5.jsx
+                            Echart6.jsx
+                            Echart7.jsx
+                            Echart8.jsx
+                            Echart9.jsx
+                        cards
+                            AppCards.jsx
+                        carousel
+                            AppCarousel.jsx
+                        collapsibles
+                            AppCollapsibles.jsx
+                        lists
+                            AppList.jsx
+                        modals
+                            AppModal.jsx
+                            BasicModal.jsx
+                            ScrollableModal.jsx
+                        pagination
+                            AppPagination.jsx
+                        popover
+                            AppPopover.jsx
+                        progressbar
+                            AppProgressbar.jsx
+                        ratings
+                            AppRating.jsx
+                        slider
+                            AppSlider.jsx
+                            BasicSlider.jsx
+                            MarkSlider.jsx
+                            MinMaxSlider.jsx
+                            MultiRangeSlider.jsx
+                            MultiStyledSlider.jsx
+                            RangeSlider.jsx
+                            StepSlider.jsx
+                            VerticalSlider.jsx
+                        tables
+                            AppTable.jsx
+                        tabs
+                            AppTab.jsx
+                        tooltip
+                            AppTooltip.jsx
+                    widgets
+                        AppWidget.jsx
+                        CardWidget.jsx
+                        ListWidget.jsx
+                        listWidgetChartOptions.js
+                        StatisticsWidget.jsx
+                        statisticsWidgetChartOptions.js
+                        WeatherWidget.jsx
+                        widgetsRoute.js
+            fake-db
+                index.js
+                mock.js
+                db
+                    calendarEvents.js
+                    chat.js
+                    ecommerce.js
+                    inbox.js
+                    invoice.js
+                    list.js
+                    notification.js
+                    procedimientos.js
+                    registros.js
+                    scrumBoard.js
+                    todos.js
+                    users.js
+            styles
+                paperclip.svg
+                app
+                    app.scss
+                    _bootstrap-rtl.scss
+                    _variables.scss
+                    globals
+                        _animations.scss
+                        _box-shadow.scss
+                        _colors.scss
+                        _footer.scss
+                        _globals.scss
+                        _header-top.scss
+                        _header.scss
+                        _height-width.scss
+                        _layout.scss
+                        _palette.scss
+                        _typography.scss
+                        components
+                            _accordions.scss
+                            _alerts.scss
+                            _avatar.scss
+                            _badges.scss
+                            _borders.scss
+                            _breadcrumb.scss
+                            _button.scss
+                            _calendar.scss
+                            _card.scss
+                            _carousel.scss
+                            _components.scss
+                            _customizer.scss
+                            _datatables.scss
+                            _dropdown.scss
+                            _editor.scss
+                            _feather-icon.scss
+                            _form.scss
+                            _full-calendar.scss
+                            _hljs.scss
+                            _icon.scss
+                            _img-cropper.scss
+                            _lists.scss
+                            _loader.scss
+                            _modals.scss
+                            _nouislider.scss
+                            _outline.scss
+                            _pagination.scss
+                            _popover.scss
+                            _progress.scss
+                            _quill.scss
+                            _rating.scss
+                            _react-tour.scss
+                            _search.scss
+                            _sidebar.directive.scss
+                            _smart.wizard.scss
+                            _tab.scss
+                            _tabs.scss
+                            _tagging.scss
+                            _toastr.scss
+                            _tour.scss
+                            _upload.scss
+                        functions
+                            _color-map.scss
+                            _functions.scss
+                        layouts
+                            _colors.scss
+                            _footer.scss
+                            _layouts.scss
+                            horizontal-bar
+                                _header.scss
+                                _layout-horizontal-bar.scss
+                                _vars.scss
+                            sidebar-compact
+                                _header.scss
+                                _layout-sidebar-compact.scss
+                                _vars.scss
+                            sidebar-large
+                                _header.scss
+                                _layout-sidebar-large.scss
+                                _vars.scss
+                            vertical-navbar
+                                _content.scss
+                                _header.scss
+                                _sidebar.scss
+                                _vertical-navbar.scss
+                        mixins
+                            _gradients.scss
+                            _keyframes.scss
+                            _mixins.scss
+                        newLayout
+                            _newLayout.scss
+                            _sidebar.scss
+                        utilities
+                            _border.scss
+                            _others.scss
+                            _spacing.scss
+                            _utilities.scss
+                        views
+                            _404.scss
+                            _accordion.scss
+                            _b4.borders.scss
+                            _b4.display.scss
+                            _basic-action-bar.scss
+                            _bootstrap-tab.scss
+                            _chat.scss
+                            _collapsible.scss
+                            _contact-detail.scss
+                            _contact-list-table.scss
+                            _contact-list.scss
+                            _contact-page.scss
+                            _data-tables.scss
+                            _dropdown.scss
+                            _faq.scss
+                            _form-mega-option.scss
+                            _inbox.scss
+                            _input-groups.scss
+                            _invoice.scss
+                            _landing.scss
+                            _line-tab.scss
+                            _multi-column-forms.scss
+                            _pricing-table.scss
+                            _product-detail.scss
+                            _session.scss
+                            _task-manager-list.scss
+                            _task-manager.scss
+                            _todo.scss
+                            _user-profile.scss
+                            _views.scss
+                            _weather-card.scss
+                            _widget-app.scss
+                            _widget-card.scss
+                            _widget-list.scss
+                            _widgets-statistics.scss
+                    themes
+                        dark-purple.scss
+                        lite-blue.scss
+                        lite-purple.scss
+                        _colors.scss
+                        dark
+                            _dark.scss
+                iconsmind
+                    iconsmind.css
+                    iconsmind.eot
+                    iconsmind.svg
+                    iconsmind.ttf
+                    iconsmind.woff
+                vendor
+                    animate.scss
+                        animate.css
+                        animate.css.map
+                        animate.min.css
+                        animate.min.css.map
+                        animate.scss
+                        _properties.scss
+                        _attention-seekers
+                            attention-seekers.scss
+                            _bounce.scss
+                            _flash.scss
+                            _jello.scss
+                            _pulse.scss
+                            _rubberBand.scss
+                            _shake.scss
+                            _swing.scss
+                            _tada.scss
+                            _wobble.scss
+                        _bouncing-entrances
+                            bouncing-entrances.scss
+                            _bounceIn.scss
+                            _bounceInDown.scss
+                            _bounceInLeft.scss
+                            _bounceInRight.scss
+                            _bounceInUp.scss
+                        _bouncing-exits
+                            bouncing-exits.scss
+                            _bounceOut.scss
+                            _bounceOutDown.scss
+                            _bounceOutLeft.scss
+                            _bounceOutRight.scss
+                            _bounceOutUp.scss
+                        _fading-entrances
+                            fading-entrances.scss
+                            _fadeIn.scss
+                            _fadeInDown.scss
+                            _fadeInDownBig.scss
+                            _fadeInLeft.scss
+                            _fadeInLeftBig.scss
+                            _fadeInRight.scss
+                            _fadeInRightBig.scss
+                            _fadeInUp.scss
+                            _fadeInUpBig.scss
+                        _fading-exits
+                            fading-exits.scss
+                            _fadeOut.scss
+                            _fadeOutDown.scss
+                            _fadeOutDownBig.scss
+                            _fadeOutLeft.scss
+                            _fadeOutLeftBig.scss
+                            _fadeOutRight.scss
+                            _fadeOutRightBig.scss
+                            _fadeOutUp.scss
+                            _fadeOutUpBig.scss
+                        _flippers
+                            flippers.scss
+                            _flip.scss
+                            _flipInX.scss
+                            _flipInY.scss
+                            _flipOutX.scss
+                            _flipOutY.scss
+                        _lightspeed
+                            lightspeed.scss
+                            _lightSpeedIn.scss
+                            _lightSpeedOut.scss
+                        _rotating-entrances
+                            rotating-entrances.scss
+                            _rotateIn.scss
+                            _rotateInDownLeft.scss
+                            _rotateInDownRight.scss
+                            _rotateInUpLeft.scss
+                            _rotateInUpRight.scss
+                        _rotating-exits
+                            rotating-exits.scss
+                            _rotateOut.scss
+                            _rotateOutDownLeft.scss
+                            _rotateOutDownRight.scss
+                            _rotateOutUpLeft.scss
+                            _rotateOutUpRight.scss
+                        _sliding-entrances
+                            sliding-entrances.scss
+                            _slideInDown.scss
+                            _slideInLeft.scss
+                            _slideInRight.scss
+                            _slideInUp.scss
+                        _sliding-exits
+                            sliding-exits.scss
+                            _slideOutDown.scss
+                            _slideOutLeft.scss
+                            _slideOutRight.scss
+                            _slideOutUp.scss
+                        _specials
+                            specials.scss
+                            _hinge.scss
+                            _rollIn.scss
+                            _rollOut.scss
+                        _zooming-entrances
+                            zooming-entrances.scss
+                            _zoomIn.scss
+                            _zoomInDown.scss
+                            _zoomInLeft.scss
+                            _zoomInRight.scss
+                            _zoomInUp.scss
+                        _zooming-exits
+                            zooming-exits.scss
+                            _zoomOut.scss
+                            _zoomOutDown.scss
+                            _zoomOutLeft.scss
+                            _zoomOutRight.scss
+                            _zoomOutUp.scss
+                    bootstrap
+                        .babelrc.js
+                        .browserslistrc
+                        .editorconfig
+                        .eslintignore
+                        .eslintrc.json
+                        .stylelintignore
+                        .stylelintrc
+                        .travis.yml
+                        bootstrap-grid.scss
+                        bootstrap-reboot.scss
+                        bootstrap.scss
+                        _alert.scss
+                        _badge.scss
+                        _breadcrumb.scss
+                        _button-group.scss
+                        _buttons.scss
+                        _card.scss
+                        _carousel.scss
+                        _close.scss
+                        _code.scss
+                        _custom-forms.scss
+                        _dropdown.scss
+                        _forms.scss
+                        _functions.scss
+                        _grid.scss
+                        _images.scss
+                        _input-group.scss
+                        _jumbotron.scss
+                        _list-group.scss
+                        _media.scss
+                        _mixins.scss
+                        _modal.scss
+                        _nav.scss
+                        _navbar.scss
+                        _pagination.scss
+                        _popover.scss
+                        _print.scss
+                        _progress.scss
+                        _reboot.scss
+                        _root.scss
+                        _tables.scss
+                        _toasts.scss
+                        _tooltip.scss
+                        _transitions.scss
+                        _type.scss
+                        _utilities.scss
+                        _variables.scss
+                        mixins
+                            _alert.scss
+                            _background-variant.scss
+                            _badge.scss
+                            _border-radius.scss
+                            _box-shadow.scss
+                            _breakpoints.scss
+                            _buttons.scss
+                            _caret.scss
+                            _clearfix.scss
+                            _float.scss
+                            _forms.scss
+                            _gradients.scss
+                            _grid-framework.scss
+                            _grid.scss
+                            _hover.scss
+                            _image.scss
+                            _list-group.scss
+                            _lists.scss
+                            _nav-divider.scss
+                            _pagination.scss
+                            _reset-text.scss
+                            _resize.scss
+                            _screen-reader.scss
+                            _size.scss
+                            _table-row.scss
+                            _text-emphasis.scss
+                            _text-hide.scss
+                            _text-truncate.scss
+                            _transition.scss
+                            _visibility.scss
+                        utilities
+                            _align.scss
+                            _background.scss
+                            _borders.scss
+                            _clearfix.scss
+                            _display.scss
+                            _embed.scss
+                            _flex.scss
+                            _float.scss
+                            _position.scss
+                            _screenreaders.scss
+                            _shadows.scss
+                            _sizing.scss
+                            _spacing.scss
+                            _text.scss
+                            _visibility.scss
+                    bootstrap-rtl
+                        bootstrap-grid.scss
+                        bootstrap-reboot.scss
+                        bootstrap.scss
+                        _alert.scss
+                        _badge.scss
+                        _breadcrumb.scss
+                        _button-group.scss
+                        _buttons.scss
+                        _card.scss
+                        _carousel.scss
+                        _close.scss
+                        _code.scss
+                        _custom-forms.scss
+                        _dropdown.scss
+                        _forms.scss
+                        _functions.scss
+                        _grid.scss
+                        _images.scss
+                        _input-group.scss
+                        _jumbotron.scss
+                        _list-group.scss
+                        _media.scss
+                        _mixins.scss
+                        _modal.scss
+                        _nav.scss
+                        _navbar.scss
+                        _pagination.scss
+                        _popover.scss
+                        _print.scss
+                        _progress.scss
+                        _reboot.scss
+                        _root.scss
+                        _tables.scss
+                        _tooltip.scss
+                        _transitions.scss
+                        _type.scss
+                        _utilities.scss
+                        _variables.scss
+                        mixins
+                            _alert.scss
+                            _background-variant.scss
+                            _badge.scss
+                            _border-radius.scss
+                            _box-shadow.scss
+                            _breakpoints.scss
+                            _buttons.scss
+                            _caret.scss
+                            _clearfix.scss
+                            _float.scss
+                            _forms.scss
+                            _gradients.scss
+                            _grid-framework.scss
+                            _grid.scss
+                            _hover.scss
+                            _image.scss
+                            _list-group.scss
+                            _lists.scss
+                            _nav-divider.scss
+                            _navbar-align.scss
+                            _pagination.scss
+                            _reset-text.scss
+                            _resize.scss
+                            _screen-reader.scss
+                            _size.scss
+                            _table-row.scss
+                            _text-emphasis.scss
+                            _text-hide.scss
+                            _text-truncate.scss
+                            _transition.scss
+                            _visibility.scss
+                        utilities
+                            _align.scss
+                            _background.scss
+                            _borders.scss
+                            _clearfix.scss
+                            _display.scss
+                            _embed.scss
+                            _flex.scss
+                            _float.scss
+                            _position.scss
+                            _screenreaders.scss
+                            _sizing.scss
+                            _spacing.scss
+                            _text.scss
+                            _visibility.scss
+    sql
+        actividades.sql
+        capacitaciones.sql
+        data-default.sql
+        indicadores.sql
+        negawatt_db.sql
+        objetivos-y-metas.sql

@@ -1,76 +1,70 @@
 # Repository Code Consolidator
 
-This script consolidates all code from a repository into a single combined file, facilitating the reading of the repository by artificial intelligence language models.
+This Python script provides a unified way to gather all the code from a repository into a singular text file. This feature aims to provide an easy, digestible format for artificial intelligence language models to analyze repository content.
 
-## Installation
+## Getting Started
+
+### Dependencies
+
+To run this script, you'll need to install the `gitignore_parser` library. You can do this using the following command:
 
 ```bash
 pip install gitignore_parser
 ```
 
-## Usage
+### Usage
+
+Here's how you use this script:
 
 ```bash
-python consolidate.py <repo_dir>
+python consolidate.py <repo_dir> <mode>
 ```
 
-This will generate a `combined_code.txt` file with all code concatenated.
+This command will create a text file named `combined_files.txt` that contains the repository's code content based on the specified mode ('tree', 'code', or 'both').
 
-## How it works
+## How It Works
 
-The main steps involved in the script are as follows:
+### Ignoring Unwanted Files
 
-### Parse .gitignore
-
-The script checks if a `.gitignore` file exists in the repository directory. If found, it uses the `gitignore_parser` library to parse the `.gitignore` file and obtain the ignoring matching function.
+The script first verifies the presence of a `.gitignore` file within the repository. If such a file exists, the script employs the `gitignore_parser` library to derive a function that matches the ignore rules defined in the `.gitignore` file.
 
 ```python
-gitignore = os.path.join(repo_dir, '.gitignore')
-if os.path.exists(gitignore):
-    matches = parse_gitignore(gitignore)
-else:
-    print('.gitignore not found, skipping ignore checks')
-    matches = None
+matcher = parse_ignore_file(repo_path)
 ```
 
-### Walk directory tree
+If no `.gitignore` file exists, or if a file is not listed within it, the script will proceed to include that file's content in its operations. The `.git` directory, if present, is always ignored.
 
-The script recursively walks through the repository directory using `os.walk()` to traverse all subdirectories and files. It filters out the ignored files based on the matching function obtained from the `.gitignore` file. It also ignores the `.git` folder entirely.
+### Walking Through Repository
+
+The script employs `os.walk()` to traverse the directory tree of the repository, covering all directories and files recursively. During this walk, the script filters out any ignored files and directories based on the derived matching function from the `.gitignore` file.
 
 ```python
-for root, dirs, files in os.walk(repo_dir):
-    if '.git' in dirs:
-      dirs.remove('.git')
-    # Filter ignored files
-    files = [f for f in files if not matches(os.path.join(root, f))]
+for root, dirs, files in os.walk(repo_path):
+    dirs[:] = filter_dirs(dirs, matcher, root)
+    files = filter_files((Path(root) / f for f in files), matcher)
 ```
 
-### Copy Python code
+### Processing Repository Content
 
-For each file, the script checks if it is a Python file (ends with `.py`). If it is, the script reads the contents of the file and appends it to the output string.
+Depending on the specified mode, the script either:
+
+- Prints and collects the names of the files (in 'tree' mode),
+- Copies the content of the files (in 'code' mode),
+- Or does both (in 'both' mode).
 
 ```python
-for file in files:
-    if file.endswith('.py'):
-        file_path = os.path.join(root, file)
-        with open(file_path, 'r') as f:
-            code = f.read()
-            combined_code += f"\n#### file: {file_path}\n{code}\n"
+combined_files = consolidate_code(repo_path, args.mode)
 ```
 
-### Write output file
+### Saving Output
 
-Finally, the script writes the concatenated code string to the `combined_code.txt` file.
+The script consolidates all the processed content into a single string and writes it into a file named `combined_files.txt`.
 
 ```python
-output_file = 'combined_code.txt'
-
-with open(output_file, 'w') as f:
-    f.write(combined_code)
+with open(output_file, 'w', encoding='utf-8') as f:
+    f.write(combined_files)
 ```
 
 ## License
 
-This code is released under the MIT License.
-
-I apologize for the confusion earlier, and thank you for bringing it to my attention. The updated README now accurately reflects the steps performed by the code.
+This project is licensed under the MIT License.
