@@ -9,17 +9,19 @@ def parse_ignore_file(repo_path):
     gitignore_path = repo_path / '.gitignore'
     return parse_gitignore(gitignore_path) if gitignore_path.exists() else (lambda s: False)
 
-# Helper function to determine if a file should be skipped
+# Helper function to determine if a file or directory should be skipped
 def is_skippable_file(filename):
     # Define a set of skippable file patterns or exact names
     skippable_files = {
         '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.ico',  # image files
+        '.pyc', '.pyo',  # Python cache files
+        '.db', '.sqlite', '.sqlite3',  # Database files
         'package-lock.json'  # auto-generated large files
     }
     # Check if the file name exactly matches any skippable files
     if filename in skippable_files:
         return True
-    # Check if the file ends with any skippable extensions
+    # Check if the file ends with any skippable extensions or directory names
     return any(filename.endswith(ext) for ext in skippable_files if ext.startswith('.'))
 
 def filter_files(files, matcher, file_list=None):
@@ -29,9 +31,11 @@ def filter_files(files, matcher, file_list=None):
             and not is_skippable_file(f.name)
             and (file_list is None or str(f) in file_list)]
 
-
 def filter_dirs(dirs, matcher, root):
-    return [d for d in dirs if not matcher(os.path.join(root, d)) and '.git' not in d]
+    # Exclude __pycache__ directories directly
+    return [d for d in dirs if not matcher(os.path.join(root, d))
+            and '.git' not in d
+            and d != '__pycache__']
 
 def print_and_collect_files(repo_path, matcher):
     return _walk_files(repo_path, matcher, lambda f, dir: f"{' ' * 4 * (len(f.parts) - len(repo_path.parts))}{f.name}\n", dir=True)
