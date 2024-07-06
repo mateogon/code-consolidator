@@ -1,1218 +1,1786 @@
-NegaWatt
-    default
-    files
-    negawatt.sql
-    nginx.conf
-    package-lock.json
+apuntes-udp-front
+    .prettierignore
+    .prettierrc
+    eslint.config.mjs
     package.json
     README.md
-    backend
-        app.js
-        config.env
-        config.js
-        docs_install_dev.md
-        docs_prod.md
-        docs_tecnico.md
-        negagestion.service
-        package-lock.json
-        package.json
-        README.md
-        _config.yml
-        controllers
-            actividadesController.js
-            authController.js
-            auxController.js
-            calendarioController.js
-            capacitacionesController.js
-            dashboardController.js
-            fileController.js
-            indicadoresController.js
-            mailController.js
-            medicionController.js
-            moduleController.js
-            objetivosController.js
-            organizacionController.js
-            sessionController.js
-            tokenMiddleware.js
-            userController.js
-        jobs
-            index.js
-            package-lock.json
-            package.json
+    tailwind.config.js
+    .anima
+        components.json
+        conventions.json
+        enrichments.json
+        workspace.json
+    public
+        index.html
+        manifest.json
+        robots.txt
+    src
+        App.js
+        index.js
+        components
+            ScrollableList.jsx
+            UploadFile.jsx
+        forms
+            UserForm.jsx
+        images
+        layouts
+            EmptyLayout.jsx
+            MainLayout.jsx
+            MainLayoutTop.jsx
+            components
+                MenuSider.jsx
+                Navbar.jsx
+        pages
+            Home.jsx
+            Inicio.jsx
+            Login.jsx
+            Miembros.jsx
+            Proyecto.jsx
+            Proyectos.jsx
+            Referencia.jsx
+            Subir.jsx
+            Usuarios.jsx
         routes
-            database.js
-            Routes.js
-        utils
-            apiFeatures.js
-            appError.js
-            authorize.js
-            email.js
-            template.ejs
-            validateData.js
-            validateUniqueEmail.js
-    frontend
-        .env
-        description.html
-        jsconfig.json
-        package-lock.json
-        package.json
-        README.md
-        yarn.lock
-        docs
-            authentication.html
-            breadcrumb.html
-            dependencies.html
-            empty-page.html
-            gulpfile.js
-            index.html
-            layout.html
-            navigation.html
-            package-lock.json
-            package.json
-            routing.html
-            structure.html
-            assets
-                css
-                    doc.css
-                    doc.min.css
-                js
-                    es5
-                        doc.js
-                        doc.min.js
-                        header.js
-                        header.min.js
-                        sidebar.js
-                        sidebar.min.js
-                    main
-                        doc.js
-                        header.js
-                        sidebar.js
-                sass
-                    doc.scss
-                styles
-                    css
-                        done
-                            done.css
-                            done.min.css
-                    sass
-                        done
-                            done.scss
-                            _reboot.scss
-                            components
-                                _accordions.scss
-                                _alerts.scss
-                                _avatar.scss
-                                _badge.scss
-                                _bootstrap-select.scss
-                                _bootstrap-slider.scss
-                                _breadcrumb.scss
-                                _button.scss
-                                _card.scss
-                                _carousel.scss
-                                _collapse.scss
-                                _components.scss
-                                _dropdown.scss
-                                _icon.scss
-                                _input.scss
-                                _list.scss
-                                _lists.scss
-                                _modal.scss
-                                _nav.scss
-                                _navbar.scss
-                                _pagination.scss
-                                _popover.scss
-                                _pricing.scss
-                                _progress.scss
-                                _tab.scss
-                                _upload.scss
-                            functions
-                                _color.function.scss
-                                _functions.scss
-                                _shadow.function.scss
-                            mixins
-                                _animation.scss
-                                _badge.scss
-                                _border.scss
-                                _buttons.scss
-                                _card.scss
-                                _dropdown.scss
-                                _hover.scss
-                                _icons.scss
-                                _inputs.scss
-                                _mixins.scss
-                                _nav.scss
-                                _responsive.scss
-                                _shadow.scss
-                            sections
-                                _demo.scss
-                                _header-animated.scss
-                                _sections.scss
-                            utilities
-                                _border.scss
-                                _colors.scss
-                                _height-width.scss
-                                _shadow.scss
-                                _spacing.scss
-                                _typography.scss
-                                _utilities.scss
-                            variables
-                                _alert.scss
-                                _animation.scss
-                                _base.scss
-                                _bootstrap-select.scss
-                                _border.scss
-                                _breadcrumb.scss
-                                _buttons.scss
-                                _cards.scss
-                                _colors.scss
-                                _icon.scss
-                                _inputs.scss
-                                _nav.scss
-                                _navbar.scss
-                                _pagination.scss
-                                _progress.scss
-                                _shadows.scss
-                                _spacing.scss
-                                _typography.scss
-                                _variables.scss
-                                _z-index.scss
-                vendor
-                    clipboard.min.js
-                    feather.min.js
-                    jquery-3.4.1.min.js
-                    bootstrap
-                        css
-                            bootstrap-grid.css
-                            bootstrap-grid.css.map
-                            bootstrap-grid.min.css
-                            bootstrap-grid.min.css.map
-                            bootstrap-reboot.css
-                            bootstrap-reboot.css.map
-                            bootstrap-reboot.min.css
-                            bootstrap-reboot.min.css.map
-                            bootstrap.css
-                            bootstrap.css.map
-                            bootstrap.min.css
-                            bootstrap.min.css.map
-                        js
-                            bootstrap.bundle.js
-                            bootstrap.bundle.js.map
-                            bootstrap.bundle.min.js
-                            bootstrap.bundle.min.js.map
-                            bootstrap.js
-                            bootstrap.js.map
-                            bootstrap.min.js
-                            bootstrap.min.js.map
-        public
-            favicon.ico
-            index.html
-            logo192.png
-            logo512.png
-            manifest.json
-            robots.txt
-            assets
-                images
-                    Angular_Icon.png
-                    bg-1.png
-                    bootstrap-logo.png
-                    checkmark.svg
-                    close.svg
-                    danger.svg
-                    gull-large-sidebar.png
-                    Html_Icon.png
-                    info.svg
-                    laravel-logo.png
-                    logo-black.png
-                    logo-text.png
-                    logo-white.png
-                    logo.png
-                    mac_book.jpg
-                    master-card.png
-                    page-bg-bottom.png
-                    paypal.png
-                    photo-long-1.jpg
-                    photo-long-2.jpg
-                    photo-long-3.jpg
-                    photo-long-4.jpg
-                    photo-wide-1.jpg
-                    photo-wide-2.jpg
-                    photo-wide-3.jpg
-                    photo-wide-4.jpg
-                    photo-wide-5.jpeg
-                    ps.png
-                    Sass_icon.png
-                    visa.png
-                    faces
-                        1.jpg
-                        10.jpg
-                        12.jpg
-                        13.jpg
-                        15.jpg
-                        16.jpg
-                        17.jpg
-                        2.jpg
-                        3.jpg
-                        4.jpg
-                        5.jpg
-                        9.jpg
-                        face-1.jpg
-                        face-2.jpg
-                        face-3.jpg
-                        face-4.jpg
-                        face-5.jpg
-                        face-6.jpg
-                        face-7.jpg
-                    products
-                        cloud-346710_1280.png
-                        headphone-1.jpg
-                        headphone-2.jpg
-                        headphone-3.jpg
-                        headphone-4.jpg
-                        iphone-1.jpg
-                        iphone-2.jpg
-                        speaker-1.jpg
-                        speaker-2.jpg
-                        watch-1.jpg
-                        watch-2.jpg
-                        weather-2.jpg
-                        weather.jpg
-                    screenshots
-                        02_preview.png
-                        04_preview.png
-                        dashboard.v1.png
-                        dashboard.v2.png
-        src
-            @history.js
-            @utils.js
-            App.test.js
             index.jsx
-            index.scss
-            logo.svg
-            serviceWorker.js
-            @gull
-                index.js
-                components
-                    Breadcrumb.jsx
-                    CodeViewer.jsx
-                    DropDownMenu.jsx
-                    DropDownMenuItem.jsx
-                    GullSearch.jsx
-                    GullTooltip.jsx
-                    MegaMenu.jsx
-                    RichTextEditor.jsx
-                    accordions
-                        RightArrowAccordion.jsx
-                    badges
-                        OutlinedBadge.jsx
-                    buttons
-                        LoadingButton.jsx
-                    cards
-                        SimpleCard.jsx
-                    charts
-                        EchartCreator.jsx
-                        EchartOptions.jsx
-                        RechartCreator.jsx
-                    GullLoadable
-                        GullLoadable.jsx
-                        Loading.js
-                    GullSidenav
-                        GullSidenav.jsx
-                        GullSidenavContainer.jsx
-                        GullSidenavContent.jsx
-                theme
-                    EchartTheme.jsx
-            app
-                App.jsx
-                appContext.js
-                backend.js
-                navigations.js
-                RootRoutes.jsx
-                auth
-                    Auth.jsx
-                    AuthGuard.jsx
-                    authRoles.js
-                GullLayout
-                    GullLayout.jsx
-                    index.js
-                    settings.js
-                    Layout1
-                        Layout1.jsx
-                        Layout1Header.jsx
-                        Layout1Settings.js
-                        Layout1Sidenav.jsx
-                    Layout2
-                        Layout2.jsx
-                        Layout2Header.jsx
-                        Layout2Settings.js
-                        Layout2Sidenav.jsx
-                    Layout3
-                        Layout3.jsx
-                        Layout3Header.jsx
-                        Layout3Settings.js
-                        Layout3Sidenav.jsx
-                    SharedComponents
-                        Customizer.jsx
-                        Footer.jsx
-                redux
-                    Store.js
-                    actions
-                        EcommerceActions.js
-                        LayoutActions.js
-                        LoginActions.js
-                        NotificationActions.js
-                        ScrumBoardActions.js
-                        UserActions.js
-                    reducers
-                        EcommerceReducer.js
-                        LayoutReducer.js
-                        LoginReducer.js
-                        NotificationReducer.js
-                        RootReducer.js
-                        ScrumBoardReducer.js
-                        UserReducer.js
-                services
-                    AuthService.js
-                    jwtAuthService.js
-                    localStorageService.js
-                    firebase
-                        firebaseAuthService.js
-                        firebaseConfig.js
-                views
-                    app
-                        actividades
-                            Actividades.jsx
-                            partials
-                                CambiarEstadoInstancia.jsx
-                                FormActividad.jsx
-                                FormCrearInstancia.jsx
-                                GestionarPeriodo.jsx
-                                GestionarPeriodos.jsx
-                                styles.css
-                                TablaActividades.jsx
-                        calendar
-                            AppCalendar.jsx
-                            CalendarEventDialog.jsx
-                            calendarRoutes.js
-                            CalendarService.js
-                        calendario
-                            Calendario.jsx
-                        capacitaciones
-                            Capacitaciones.jsx
-                            partials
-                                CambiarEstadoInstancia.jsx
-                                FormCapacitacion.jsx
-                                FormCrearInstancia.jsx
-                                GestionarPeriodo.jsx
-                                GestionarPeriodos.jsx
-                                styles.css
-                                TablaCapacitaciones.jsx
-                        chat
-                            AppChat.jsx
-                            ChatContainer.jsx
-                            chatRoutes.js
-                            chatService.js
-                            ChatSidenav.jsx
-                            EmptyMessage.jsx
-                        contact
-                            AccionCrear.jsx
-                            AccionEditar.jsx
-                            AnexoConf.jsx
-                            AnexoDoc.jsx
-                            AnexoRef.jsx
-                            ArchivoEditar.jsx
-                            ArchivoNCEditar.jsx
-                            CerrarNC.jsx
-                            ConformidadCrear.jsx
-                            ConformidadEditar.jsx
-                            Conformidadv2.jsx
-                            ContactCard.jsx
-                            ContactDetails.jsx
-                            ContactEditor.jsx
-                            ContactEditor2.jsx
-                            ContactList.jsx
-                            contactRoutes.js
-                            contactService.js
-                            ContactTable.jsx
-                            CrudTable.jsx
-                            Descarga.jsx
-                            DocRef.jsx
-                            Documentosv2.jsx
-                            Documetos.jsx
-                            Dowload.jsx
-                            FormikCheckboxGroup.jsx
-                            GestorEditor.jsx
-                            GestorEditor2.jsx
-                            Gestores.jsx
-                            HistorialConf.jsx
-                            HistorialDoc.jsx
-                            HistorialRegistro.jsx
-                            ListadoMaestro.jsx
-                            ListadoNC.jsx
-                            ListaGestor.jsx
-                            ListaGestorAdd.jsx
-                            maestro.jsx
-                            MemberEditorDialog.jsx
-                            OrganizacionEditor.jsx
-                            Organizaciones.jsx
-                            Permisos.jsx
-                            proceService.js
-                            Registros.jsx
-                            Registrosv2.jsx
-                            regService.js
-                            Responsables.jsx
-                            Sedes.jsx
-                            SelectSite.jsx
-                            Sitios.jsx
-                            SitiosEditor.jsx
-                            SitiosEditor2.jsx
-                            VerModificar.jsx
-                            _ListadoMaestro.jsx
-                            Gestor
-                                GestorForm.jsx
-                        dashboard-sitio
-                            DashboardSitio.jsx
-                            style.css
-                        ecommerce
-                            Cart.jsx
-                            Checkout.jsx
-                            ecommerceRoutes.js
-                            ProductDetails.jsx
-                            ProductList.jsx
-                        inbox
-                            AppInbox.jsx
-                            InboxComposeDialog.jsx
-                            InboxContent.jsx
-                            inboxRoutes.js
-                            inboxService.js
-                            InboxSidenav.jsx
-                        indicadores
-                            Indicadores.jsx
-                            style.css
-                            partials
-                                FormIndicador.jsx
-                                Indicador.jsx
-                        invoice
-                            InvoiceDetails.jsx
-                            InvoiceEditor.jsx
-                            InvoiceList.jsx
-                            invoiceRoutes.js
-                            InvoiceService.js
-                            InvoiceViewer.jsx
-                            NW_codigos_color.pdf
-                            SimpleTableCreator.jsx
-                        medicion-y-verificacion
-                            ClonarE.jsx
-                            CrearEnergetico.jsx
-                            CrearSGE.jsx
-                            EditarSGE.jsx
-                            EnergeticoEditar.jsx
-                            EnergeticoFechas.jsx
-                            medicion.css
-                            Medicion.jsx
-                            proceService.js
-                            SGEFechas.jsx
-                        objetivos-y-metas
-                            ObjetivosYMetas.jsx
-                            partials
-                                FieldValorActual.jsx
-                                FormObjetivo.jsx
-                                FormValorActual.jsx
-                                style.css
-                                TablaObjetivos.jsx
-                        task-manager
-                            TaskManager.jsx
-                            TaskManagerList.jsx
-                            taskManagerRoutes.js
-                            todo
-                                AppTodo.jsx
-                                TagDialog.jsx
-                                TodoEditor.jsx
-                                TodoItem.jsx
-                                TodoList.jsx
-                                todoRoutes.js
-                                todoService.js
-                        utils
-                            FieldsAdjunto.jsx
-                            FormikCalendarField.jsx
-                            FormikCheckboxGroup.jsx
-                            FormikCheckboxOnly.jsx
-                            FormikFieldValidation.jsx
-                            FormikFocusErrorHook.jsx
-                            FormikSelectValidation.jsx
-                            FormikSelectValidationData.jsx
-                            FormikSwitchField.jsx
-                            FormSubirAdjunto.jsx
-                            IconButton.jsx
-                            IconOverlay.jsx
-                            LineEllipsisTooltip.jsx
-                            ListaAdjuntos.jsx
-                            SwalConfirmDelete.jsx
-                    charts
-                        chartsRoute.js
-                        apex
-                            ApexAreaChart.jsx
-                            apexAreaChartOptions.js
-                            ApexBarChart.jsx
-                            apexBarChartOptions.js
-                            ApexBubbleChart.jsx
-                            apexBubbleChartOptions.js
-                            apexCandleStickChartOptions.js
-                            ApexColumnChart.jsx
-                            apexColumnChartOptions.js
-                            ApexDoughnutChart.jsx
-                            apexDoughnutChartOptions.js
-                            ApexLineChart.jsx
-                            apexLineChartOptions.js
-                            ApexMixChart.jsx
-                            apexMixChartOptions.js
-                            ApexRadarChart.jsx
-                            apexRadarChartOptions.js
-                            ApexRadialBarChart.jsx
-                            apexRadialBarChartOptions.js
-                            ApexScatterChart.jsx
-                            apexScatterChartOption.js
-                            ApexSparkLineChart.jsx
-                            apexSparkLineOptions.js
-                            dataSeries.js
-                        echarts
-                            AppEchart.jsx
-                            AreaChart.jsx
-                            ComparisonChart.jsx
-                            Doughnut.jsx
-                            echartOptions.js
-                            LineChart1.jsx
-                            LineChart2.jsx
-                            LineChart3.jsx
-                            LineChart4.jsx
-                            PieChart.jsx
-                        react-vis
-                            AppReactVis.jsx
-                            BigBaseBarSeries.jsx
-                            ColoredLineChart.jsx
-                            ContourData.js
-                            ContourSeries.jsx
-                            LabelledHeatMap.jsx
-                            VisAreaChart.jsx
-                            VisBarChart.jsx
-                            VisLineChart.jsx
-                        recharts
-                            AppRechart.jsx
-                            LineBarAreaComposedChart.jsx
-                            SimpleBarChart.jsx
-                            SimpleLineChart.jsx
-                            SimpleRadarChart.jsx
-                            SimpleRadialBar.jsx
-                            SimpleScatterChart.jsx
-                            SimpleTreeMap.jsx
-                            StackedAreaChart.jsx
-                            TwoSimplePieChart.jsx
-                        victory-charts
-                            AlternativeEvents.jsx
-                            AppVictoryChart.jsx
-                            CircularProgressBar.jsx
-                            CustomTooltipLabelChart.jsx
-                            RadarChart.jsx
-                            StackedPolarBar.jsx
-                            VictoryAreaAnimation.jsx
-                    dashboard
-                        dashboardRoutes.js
-                        dashboard1
-                            Dashboard1.jsx
-                        dashboard2
-                            Dashboard2.jsx
-                    dataTable
-                        AppDataTable.jsx
-                        BasicDataTable.jsx
-                        CellEditorDataTable.jsx
-                        dataTableRoute.js
-                        DefaultSortedDataTable.jsx
-                        MultiColumnOrderingDataTable.jsx
-                        SearchableDataTable.jsx
-                    extra-kits
-                        AppDropdown.jsx
-                        AppImageCropper.jsx
-                        AppLoader.jsx
-                        AppSweetAlert.jsx
-                        AppToastr.jsx
-                        AppTour.jsx
-                        extraKitsRoutes.js
-                        LaddaButtons.jsx
-                        UploadForm.jsx
-                    forms
-                        ActionBarForm.jsx
-                        Actualizar.jsx
-                        CargarIYR.jsx
-                        CargarNC.jsx
-                        CustomTagInput.jsx
-                        FormBasic.jsx
-                        FormBasic2.jsx
-                        FormEditor.jsx
-                        formsRoutes.js
-                        FormsWizard.jsx
-                        FormValidation.jsx
-                        FormWizardNav.jsx
-                        InfArch.jsx
-                        InputGroupForm.jsx
-                        LayoutForm.jsx
-                        Modificar.jsx
-                        ModificarIYR.jsx
-                        ModificarModal.jsx
-                        MultiColumnForms.jsx
-                        Registro.jsx
-                        richEditorContent.js
-                        SubirDYP.jsx
-                        SubirIYR.jsx
-                        SubirNC.jsx
-                        TagInput.jsx
-                    icons
-                        AppIcon.jsx
-                        iconsMind.js
-                        iconsRoutes.js
-                    pages
-                        BlankPage.jsx
-                        FAQ.jsx
-                        pagesRoutes.js
-                        PricingTable.jsx
-                        SearchResults.jsx
-                        UserProfile.jsx
-                    sessions
-                        Error.jsx
-                        ForgotPassword.jsx
-                        sessionsRoutes.js
-                        Signin.jsx
-                        Signup.jsx
-                    ui-kits
-                        uiKitsRoutes.js
-                        accordions
-                            AppAccordion.jsx
-                            CustomAccordin.jsx
-                            IconAccordin.jsx
-                            IconlessAccordin.jsx
-                            RightArrowLessAccordin.jsx
-                            SimpleAccordion.jsx
-                        alerts
-                            AppAlert.jsx
-                            DangerAlert.jsx
-                            SimpleAlert.jsx
-                            SuccessAlert.jsx
-                        badges
-                            AppBadge.jsx
-                        buttons
-                            AppButton.jsx
-                        card-metrics
-                            CardMetrics.jsx
-                            Echart1.jsx
-                            Echart10.jsx
-                            Echart2.jsx
-                            Echart3.jsx
-                            Echart4.jsx
-                            Echart5.jsx
-                            Echart6.jsx
-                            Echart7.jsx
-                            Echart8.jsx
-                            Echart9.jsx
-                        cards
-                            AppCards.jsx
-                        carousel
-                            AppCarousel.jsx
-                        collapsibles
-                            AppCollapsibles.jsx
-                        lists
-                            AppList.jsx
-                        modals
-                            AppModal.jsx
-                            BasicModal.jsx
-                            ScrollableModal.jsx
-                        pagination
-                            AppPagination.jsx
-                        popover
-                            AppPopover.jsx
-                        progressbar
-                            AppProgressbar.jsx
-                        ratings
-                            AppRating.jsx
-                        slider
-                            AppSlider.jsx
-                            BasicSlider.jsx
-                            MarkSlider.jsx
-                            MinMaxSlider.jsx
-                            MultiRangeSlider.jsx
-                            MultiStyledSlider.jsx
-                            RangeSlider.jsx
-                            StepSlider.jsx
-                            VerticalSlider.jsx
-                        tables
-                            AppTable.jsx
-                        tabs
-                            AppTab.jsx
-                        tooltip
-                            AppTooltip.jsx
-                    widgets
-                        AppWidget.jsx
-                        CardWidget.jsx
-                        ListWidget.jsx
-                        listWidgetChartOptions.js
-                        StatisticsWidget.jsx
-                        statisticsWidgetChartOptions.js
-                        WeatherWidget.jsx
-                        widgetsRoute.js
-            fake-db
-                index.js
-                mock.js
-                db
-                    calendarEvents.js
-                    chat.js
-                    ecommerce.js
-                    inbox.js
-                    invoice.js
-                    list.js
-                    notification.js
-                    procedimientos.js
-                    registros.js
-                    scrumBoard.js
-                    todos.js
-                    users.js
-            styles
-                paperclip.svg
-                app
-                    app.scss
-                    _bootstrap-rtl.scss
-                    _variables.scss
-                    globals
-                        _animations.scss
-                        _box-shadow.scss
-                        _colors.scss
-                        _footer.scss
-                        _globals.scss
-                        _header-top.scss
-                        _header.scss
-                        _height-width.scss
-                        _layout.scss
-                        _palette.scss
-                        _typography.scss
-                        components
-                            _accordions.scss
-                            _alerts.scss
-                            _avatar.scss
-                            _badges.scss
-                            _borders.scss
-                            _breadcrumb.scss
-                            _button.scss
-                            _calendar.scss
-                            _card.scss
-                            _carousel.scss
-                            _components.scss
-                            _customizer.scss
-                            _datatables.scss
-                            _dropdown.scss
-                            _editor.scss
-                            _feather-icon.scss
-                            _form.scss
-                            _full-calendar.scss
-                            _hljs.scss
-                            _icon.scss
-                            _img-cropper.scss
-                            _lists.scss
-                            _loader.scss
-                            _modals.scss
-                            _nouislider.scss
-                            _outline.scss
-                            _pagination.scss
-                            _popover.scss
-                            _progress.scss
-                            _quill.scss
-                            _rating.scss
-                            _react-tour.scss
-                            _search.scss
-                            _sidebar.directive.scss
-                            _smart.wizard.scss
-                            _tab.scss
-                            _tabs.scss
-                            _tagging.scss
-                            _toastr.scss
-                            _tour.scss
-                            _upload.scss
-                        functions
-                            _color-map.scss
-                            _functions.scss
-                        layouts
-                            _colors.scss
-                            _footer.scss
-                            _layouts.scss
-                            horizontal-bar
-                                _header.scss
-                                _layout-horizontal-bar.scss
-                                _vars.scss
-                            sidebar-compact
-                                _header.scss
-                                _layout-sidebar-compact.scss
-                                _vars.scss
-                            sidebar-large
-                                _header.scss
-                                _layout-sidebar-large.scss
-                                _vars.scss
-                            vertical-navbar
-                                _content.scss
-                                _header.scss
-                                _sidebar.scss
-                                _vertical-navbar.scss
-                        mixins
-                            _gradients.scss
-                            _keyframes.scss
-                            _mixins.scss
-                        newLayout
-                            _newLayout.scss
-                            _sidebar.scss
-                        utilities
-                            _border.scss
-                            _others.scss
-                            _spacing.scss
-                            _utilities.scss
-                        views
-                            _404.scss
-                            _accordion.scss
-                            _b4.borders.scss
-                            _b4.display.scss
-                            _basic-action-bar.scss
-                            _bootstrap-tab.scss
-                            _chat.scss
-                            _collapsible.scss
-                            _contact-detail.scss
-                            _contact-list-table.scss
-                            _contact-list.scss
-                            _contact-page.scss
-                            _data-tables.scss
-                            _dropdown.scss
-                            _faq.scss
-                            _form-mega-option.scss
-                            _inbox.scss
-                            _input-groups.scss
-                            _invoice.scss
-                            _landing.scss
-                            _line-tab.scss
-                            _multi-column-forms.scss
-                            _pricing-table.scss
-                            _product-detail.scss
-                            _session.scss
-                            _task-manager-list.scss
-                            _task-manager.scss
-                            _todo.scss
-                            _user-profile.scss
-                            _views.scss
-                            _weather-card.scss
-                            _widget-app.scss
-                            _widget-card.scss
-                            _widget-list.scss
-                            _widgets-statistics.scss
-                    themes
-                        dark-purple.scss
-                        lite-blue.scss
-                        lite-purple.scss
-                        _colors.scss
-                        dark
-                            _dark.scss
-                iconsmind
-                    iconsmind.css
-                    iconsmind.eot
-                    iconsmind.svg
-                    iconsmind.ttf
-                    iconsmind.woff
-                vendor
-                    animate.scss
-                        animate.css
-                        animate.css.map
-                        animate.min.css
-                        animate.min.css.map
-                        animate.scss
-                        _properties.scss
-                        _attention-seekers
-                            attention-seekers.scss
-                            _bounce.scss
-                            _flash.scss
-                            _jello.scss
-                            _pulse.scss
-                            _rubberBand.scss
-                            _shake.scss
-                            _swing.scss
-                            _tada.scss
-                            _wobble.scss
-                        _bouncing-entrances
-                            bouncing-entrances.scss
-                            _bounceIn.scss
-                            _bounceInDown.scss
-                            _bounceInLeft.scss
-                            _bounceInRight.scss
-                            _bounceInUp.scss
-                        _bouncing-exits
-                            bouncing-exits.scss
-                            _bounceOut.scss
-                            _bounceOutDown.scss
-                            _bounceOutLeft.scss
-                            _bounceOutRight.scss
-                            _bounceOutUp.scss
-                        _fading-entrances
-                            fading-entrances.scss
-                            _fadeIn.scss
-                            _fadeInDown.scss
-                            _fadeInDownBig.scss
-                            _fadeInLeft.scss
-                            _fadeInLeftBig.scss
-                            _fadeInRight.scss
-                            _fadeInRightBig.scss
-                            _fadeInUp.scss
-                            _fadeInUpBig.scss
-                        _fading-exits
-                            fading-exits.scss
-                            _fadeOut.scss
-                            _fadeOutDown.scss
-                            _fadeOutDownBig.scss
-                            _fadeOutLeft.scss
-                            _fadeOutLeftBig.scss
-                            _fadeOutRight.scss
-                            _fadeOutRightBig.scss
-                            _fadeOutUp.scss
-                            _fadeOutUpBig.scss
-                        _flippers
-                            flippers.scss
-                            _flip.scss
-                            _flipInX.scss
-                            _flipInY.scss
-                            _flipOutX.scss
-                            _flipOutY.scss
-                        _lightspeed
-                            lightspeed.scss
-                            _lightSpeedIn.scss
-                            _lightSpeedOut.scss
-                        _rotating-entrances
-                            rotating-entrances.scss
-                            _rotateIn.scss
-                            _rotateInDownLeft.scss
-                            _rotateInDownRight.scss
-                            _rotateInUpLeft.scss
-                            _rotateInUpRight.scss
-                        _rotating-exits
-                            rotating-exits.scss
-                            _rotateOut.scss
-                            _rotateOutDownLeft.scss
-                            _rotateOutDownRight.scss
-                            _rotateOutUpLeft.scss
-                            _rotateOutUpRight.scss
-                        _sliding-entrances
-                            sliding-entrances.scss
-                            _slideInDown.scss
-                            _slideInLeft.scss
-                            _slideInRight.scss
-                            _slideInUp.scss
-                        _sliding-exits
-                            sliding-exits.scss
-                            _slideOutDown.scss
-                            _slideOutLeft.scss
-                            _slideOutRight.scss
-                            _slideOutUp.scss
-                        _specials
-                            specials.scss
-                            _hinge.scss
-                            _rollIn.scss
-                            _rollOut.scss
-                        _zooming-entrances
-                            zooming-entrances.scss
-                            _zoomIn.scss
-                            _zoomInDown.scss
-                            _zoomInLeft.scss
-                            _zoomInRight.scss
-                            _zoomInUp.scss
-                        _zooming-exits
-                            zooming-exits.scss
-                            _zoomOut.scss
-                            _zoomOutDown.scss
-                            _zoomOutLeft.scss
-                            _zoomOutRight.scss
-                            _zoomOutUp.scss
-                    bootstrap
-                        .babelrc.js
-                        .browserslistrc
-                        .editorconfig
-                        .eslintignore
-                        .eslintrc.json
-                        .stylelintignore
-                        .stylelintrc
-                        .travis.yml
-                        bootstrap-grid.scss
-                        bootstrap-reboot.scss
-                        bootstrap.scss
-                        _alert.scss
-                        _badge.scss
-                        _breadcrumb.scss
-                        _button-group.scss
-                        _buttons.scss
-                        _card.scss
-                        _carousel.scss
-                        _close.scss
-                        _code.scss
-                        _custom-forms.scss
-                        _dropdown.scss
-                        _forms.scss
-                        _functions.scss
-                        _grid.scss
-                        _images.scss
-                        _input-group.scss
-                        _jumbotron.scss
-                        _list-group.scss
-                        _media.scss
-                        _mixins.scss
-                        _modal.scss
-                        _nav.scss
-                        _navbar.scss
-                        _pagination.scss
-                        _popover.scss
-                        _print.scss
-                        _progress.scss
-                        _reboot.scss
-                        _root.scss
-                        _tables.scss
-                        _toasts.scss
-                        _tooltip.scss
-                        _transitions.scss
-                        _type.scss
-                        _utilities.scss
-                        _variables.scss
-                        mixins
-                            _alert.scss
-                            _background-variant.scss
-                            _badge.scss
-                            _border-radius.scss
-                            _box-shadow.scss
-                            _breakpoints.scss
-                            _buttons.scss
-                            _caret.scss
-                            _clearfix.scss
-                            _float.scss
-                            _forms.scss
-                            _gradients.scss
-                            _grid-framework.scss
-                            _grid.scss
-                            _hover.scss
-                            _image.scss
-                            _list-group.scss
-                            _lists.scss
-                            _nav-divider.scss
-                            _pagination.scss
-                            _reset-text.scss
-                            _resize.scss
-                            _screen-reader.scss
-                            _size.scss
-                            _table-row.scss
-                            _text-emphasis.scss
-                            _text-hide.scss
-                            _text-truncate.scss
-                            _transition.scss
-                            _visibility.scss
-                        utilities
-                            _align.scss
-                            _background.scss
-                            _borders.scss
-                            _clearfix.scss
-                            _display.scss
-                            _embed.scss
-                            _flex.scss
-                            _float.scss
-                            _position.scss
-                            _screenreaders.scss
-                            _shadows.scss
-                            _sizing.scss
-                            _spacing.scss
-                            _text.scss
-                            _visibility.scss
-                    bootstrap-rtl
-                        bootstrap-grid.scss
-                        bootstrap-reboot.scss
-                        bootstrap.scss
-                        _alert.scss
-                        _badge.scss
-                        _breadcrumb.scss
-                        _button-group.scss
-                        _buttons.scss
-                        _card.scss
-                        _carousel.scss
-                        _close.scss
-                        _code.scss
-                        _custom-forms.scss
-                        _dropdown.scss
-                        _forms.scss
-                        _functions.scss
-                        _grid.scss
-                        _images.scss
-                        _input-group.scss
-                        _jumbotron.scss
-                        _list-group.scss
-                        _media.scss
-                        _mixins.scss
-                        _modal.scss
-                        _nav.scss
-                        _navbar.scss
-                        _pagination.scss
-                        _popover.scss
-                        _print.scss
-                        _progress.scss
-                        _reboot.scss
-                        _root.scss
-                        _tables.scss
-                        _tooltip.scss
-                        _transitions.scss
-                        _type.scss
-                        _utilities.scss
-                        _variables.scss
-                        mixins
-                            _alert.scss
-                            _background-variant.scss
-                            _badge.scss
-                            _border-radius.scss
-                            _box-shadow.scss
-                            _breakpoints.scss
-                            _buttons.scss
-                            _caret.scss
-                            _clearfix.scss
-                            _float.scss
-                            _forms.scss
-                            _gradients.scss
-                            _grid-framework.scss
-                            _grid.scss
-                            _hover.scss
-                            _image.scss
-                            _list-group.scss
-                            _lists.scss
-                            _nav-divider.scss
-                            _navbar-align.scss
-                            _pagination.scss
-                            _reset-text.scss
-                            _resize.scss
-                            _screen-reader.scss
-                            _size.scss
-                            _table-row.scss
-                            _text-emphasis.scss
-                            _text-hide.scss
-                            _text-truncate.scss
-                            _transition.scss
-                            _visibility.scss
-                        utilities
-                            _align.scss
-                            _background.scss
-                            _borders.scss
-                            _clearfix.scss
-                            _display.scss
-                            _embed.scss
-                            _flex.scss
-                            _float.scss
-                            _position.scss
-                            _screenreaders.scss
-                            _sizing.scss
-                            _spacing.scss
-                            _text.scss
-                            _visibility.scss
-    sql
-        actividades.sql
-        capacitaciones.sql
-        data-default.sql
-        indicadores.sql
-        negawatt_db.sql
-        objetivos-y-metas.sql
+        theme
+            antdTheme.js
+            colors.js
+            tailwindcss.css
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\.prettierignore
+build
+node_modules
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\.prettierrc
+{
+  "singleQuote": true,
+  "trailingComma": "es5"
+}
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\eslint.config.mjs
+import globals from 'globals';
+import pluginJs from '@eslint/js';
+import pluginReactConfig from 'eslint-plugin-react/configs/recommended.js';
+import { fixupConfigRules } from '@eslint/compat';
+import prettierConfig from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
+
+export default [
+  { languageOptions: { globals: globals.browser } },
+  pluginJs.configs.recommended,
+  {
+    files: ['**/*.jsx'],
+    languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
+  },
+  ...fixupConfigRules(pluginReactConfig),
+  prettierConfig,
+  {
+    plugins: { prettier: prettierPlugin },
+    rules: {
+      'prettier/prettier': 'error',
+    },
+  },
+];
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\package.json
+{
+  "name": "apuntes-udp-front",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@ant-design/icons": "^5.3.7",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "antd": "^5.18.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "CI=false react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.34.2",
+    "globals": "^15.4.0",
+    "prettier": "^3.3.1",
+    "tailwindcss": "^3.4.4"
+  }
+}
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\README.md
+# Getting Started with Create React App
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Available Scripts
+
+## Setup Inicial
+
+### `npm install`
+
+In the project directory, you can run:
+
+### `npm start`
+
+# Agregar nuevas rutas
+
+1. Primero, se debe crear la pÃ¡gina nueva en la carpeta `src/pages`.
+2. Luego, se debe agregar la ruta en la carpeta `src/routes`.
+3. Luego, si quieres que la pÃ¡gina aparezca en el menÃº de la izquierda, se debe agregar la ruta en la carpeta `src/layouts/components/MenuSider.jsx`.
+
+# Tip
+
+- mencionar a chagpt que estamos usando tailwind y ant design y que no cree .css
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin');
+
+// Let's create a plugin that adds utilities!
+const capitalizeFirst = plugin(function ({ addUtilities }) {
+  const newUtilities = {
+    '.capitalize-first:first-letter': {
+      textTransform: 'uppercase',
+    },
+  };
+  addUtilities(newUtilities, ['responsive', 'hover']);
+});
+export default {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#0055b3',
+        danger: '#b3002d',
+        warning: '#ffcc00',
+        success: '#00B377',
+        udp: '#b3c2c6s'
+      },
+    },
+  },
+  plugins: [capitalizeFirst],
+  corePlugins: {
+    preflight: false,
+  },
+};
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\.anima\components.json
+{"matches":{}}
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\.anima\conventions.json
+{"assetsPath":"public/","componentLibrary":"none","componentsPath":"src/layouts/components","framework":"react","language":"javascript","nextRouterType":null,"styling":"tailwind","tailwindConfigPath":"tailwind.config.js","tailwindConfigReuseEnabled":false}
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\.anima\enrichments.json
+{"codeFolding":false,"componentsReuse":true,"deepComponentDetection":false,"include":[],"localComponents":true,"packages":[],"remoteComponents":true,"useUsageExamples":true}
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\.anima\workspace.json
+{"workspaceId":"7dd6d81e-92ad-4c71-9238-db9f450fff25"}
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\public\index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Sitio WEB de apuntes UDP Arquitectura"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>Apuntes UDP</title>
+  </head>
+  <body style="margin: 0;"></body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\public\manifest.json
+{
+  "short_name": "React App",
+  "name": "Create React App Sample",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\public\robots.txt
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow:
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\App.js
+import { HashRouter, Route, Routes } from 'react-router-dom';
+import routes from './routes';
+
+function App() {
+  return (
+    <div>
+      <HashRouter>
+        {routes ? (
+          <Routes>
+            {routes.map((route, index) => (
+              <Route
+                key={toString(index)}
+                path={route.path}
+                element={
+                  <route.layout>
+                    <route.element />
+                  </route.layout>
+                }
+              />
+            ))}
+          </Routes>
+        ) : null}
+      </HashRouter>
+    </div>
+  );
+}
+
+export default App;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import whitTheme from './theme/antdTheme';
+import './theme/tailwindcss.css';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<React.StrictMode>{whitTheme(<App />)}</React.StrictMode>);
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\components\ScrollableList.jsx
+import React, { useRef } from 'react';
+
+const ScrollableContainer = ({ items, renderItem, maxVisibleItems }) => {
+  const containerRef = useRef(null);
+  const isDragging = useRef(false);
+
+  const handleMouseDown = (event) => {
+    isDragging.current = true;
+    document.addEventListener('mousemove', handleDrag);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+    document.body.classList.remove('no-select');
+    document.removeEventListener('mousemove', handleDrag);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleDrag = (event) => {
+    if (!isDragging.current) return;
+    event.preventDefault();
+    containerRef.current.scrollLeft -= event.movementX;
+  };
+
+  const handleTouchStart = (event) => {
+    containerRef.current.dataset.scrollX = containerRef.current.scrollLeft;
+    containerRef.current.dataset.clientX = event.touches[0].clientX;
+  };
+
+  const handleTouchMove = (event) => {
+    event.preventDefault();
+    const scrollX = parseInt(containerRef.current.dataset.scrollX, 10);
+    const clientX = containerRef.current.dataset.clientX;
+    const newScrollLeft = scrollX - (event.touches[0].clientX - clientX);
+    containerRef.current.scrollLeft = newScrollLeft;
+  };
+
+  return (
+    <div
+      className="flex overflow-x-auto space-x-2 !overflow-hidden p-2 w-full"
+      style={{
+        // maxWidth: `calc(120px * ${maxVisibleItems})`,
+        overflowY: 'hidden',
+      }}
+      ref={containerRef}
+      onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+    >
+      {items.map((item, index) => renderItem(item, index))}
+    </div>
+  );
+};
+
+export default ScrollableContainer;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\components\UploadFile.jsx
+import React, { useState } from 'react';
+import { Avatar, Row, Col, Modal, Input, Button } from 'antd';
+import {
+  UserAddOutlined,
+  FileAddOutlined,
+  UpOutlined,
+} from '@ant-design/icons';
+
+const UploadFile = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false); // Estado para controlar la visibilidad del popup de subida exitosa
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Evita el comportamiento por defecto del navegador
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault(); // Evita el comportamiento por defecto del navegador
+    const files = e.dataTransfer.files; // Obtiene los archivos arrastrados
+    console.log('Archivos arrastrados:', files);
+    // AquÃ­ puedes manejar los archivos, por ejemplo subirlos a un servidor
+
+    // Simulamos un tiempo de carga para demostrar el popup
+    setTimeout(() => {
+      setUploadSuccess(true);
+    }, 1000); // Popup se muestra despuÃ©s de 1 segundo
+  };
+
+  const handlePopupClose = () => {
+    setUploadSuccess(false);
+  };
+  return (
+    <div
+      //   style={{
+      //     // display: 'flex',
+      //     // justifyContent: 'center',
+      //     // alignItems: 'center',
+      //     backgroundColor: '#f2f0e6', // AÃ±adido para asegurar que el fondo completo sea del mismo color
+      //   }}
+      //   className="w-full h-full p-10"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      className="m-10"
+    >
+      <div
+        style={{
+          backgroundColor: '#f2f0e6',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        className="w-full h-full"
+      >
+        <UpOutlined style={{ fontSize: '200px', marginBottom: '20px' }} />
+        <h1 style={{ fontSize: '48px', textAlign: 'center', margin: 0 }}>
+          Arrastrar Archivo
+        </h1>
+      </div>
+
+      <Modal
+        open={uploadSuccess}
+        title="Archivo Subido Exitosamente"
+        onCancel={handlePopupClose}
+        footer={[
+          <Button key="ok" type="primary" onClick={handlePopupClose}>
+            Ok
+          </Button>,
+        ]}
+      >
+        <p>El archivo ha sido subido exitosamente.</p>
+      </Modal>
+    </div>
+  );
+};
+
+export default UploadFile;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\forms\UserForm.jsx
+import { Form, Input } from 'antd';
+import React from 'react';
+
+const UserForm = () => {
+  return (
+    <Form>
+      <Form.Item label="Nombre del proyecto" name="proyect_name">
+        <Input placeholder="Ingresar nombre del proyecto" />
+      </Form.Item>
+      <Form.Item label="TÃ­tulo" name="proyect_name">
+        <Input placeholder="Ingresar nombre del proyecto" />
+      </Form.Item>
+      <Form.Item label="Nombre del proyecto" name="proyect_name">
+        <Input placeholder="Ingresar nombre del proyecto" />
+      </Form.Item>
+    </Form>
+  );
+};
+
+export default UserForm;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\layouts\EmptyLayout.jsx
+import React from 'react';
+
+const EmptyLayout = ({ children }) => {
+  return <div>{children}</div>;
+};
+
+export default EmptyLayout;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\layouts\MainLayout.jsx
+import { Avatar, Button, Card, Layout, Menu, Space } from 'antd';
+import Sider from 'antd/es/layout/Sider';
+import { Content, Header } from 'antd/es/layout/layout';
+import Title from 'antd/es/typography/Title';
+import React from 'react';
+import MenuSider from './components/MenuSider';
+import { useLocation } from 'react-router-dom';
+
+const MainLayout = ({ children }) => {
+  // Obtener el nombre de la ruta actual
+  const location = useLocation();
+  const pageName = location.pathname.split('/')?.pop();
+  console.log(pageName);
+  return (
+    <Layout className="min-h-screen">
+      <Header className="fixed shadow-md z-50 w-full h-16 px-1 md:px-5">
+        <div className="relative w-full flex justify-between align-middle">
+          <div
+            className=" text-right cursor-pointer"
+            // onClick={openProfile}
+          >
+            <Space>
+              <p className="capitalize text-gray-500 my-0 inline-block text-sm">
+                {' '}
+                {'PEPITO'}
+              </p>
+              <Avatar />
+            </Space>
+          </div>
+
+          <Title level={2} className="!mt-0 !mb-0">
+            {pageName || 'APP'}
+          </Title>
+          <div className="mr-10">Publico</div>
+          {/* <Logo simple /> */}
+        </div>
+      </Header>
+      <Sider
+        collapsible
+        defaultCollapsed
+        className={`!fixed scroll h-full z-50 mt-16 transition-all duration-300   shadow-md md:translate-x-0 md:transform-none opacity-100`}
+      >
+        <MenuSider />
+      </Sider>
+      <Layout className="mt-16 md:ml-20 px-2 md:px-5 py-3">
+        <Content>{children}</Content>
+        <Card className="mt-2">
+          <div className=" flex flex-row justify-center align-bottom items-center">
+            <Space direction="horizontal">
+              <Space direction="vertical">
+                <p>Universidad Diego Portales</p>
+              </Space>
+            </Space>
+            <p className="font-subtitle">VersiÃ³n: 0.1</p>
+          </div>
+        </Card>
+      </Layout>
+    </Layout>
+  );
+};
+
+export default MainLayout;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\layouts\MainLayoutTop.jsx
+import React from 'react';
+import { Card, Layout } from 'antd'; // Assuming you use Ant Design layout components
+import Navbar from './components/Navbar'; // Assuming Navbar.jsx is in the same directory
+
+const { Header, Content } = Layout;
+
+const MainLayoutTop = ({ children }) => {
+  return (
+    <Layout className="min-h-screen">
+      <Header className="mx-0 md:mx-12">
+        <Navbar /> {/* Render your Navbar component in the Header section */}
+      </Header>
+      <Content className="mt-10 mx-1 md:mx-12">
+        <Card style={{ minHeight: 380, marginBottom: 24 }}>{children}</Card>
+      </Content>
+    </Layout>
+  );
+};
+
+export default MainLayoutTop;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\layouts\components\MenuSider.jsx
+import {
+  HomeOutlined,
+  UserOutlined,
+  MenuOutlined,
+  FileAddOutlined,
+  LinkOutlined,
+} from '@ant-design/icons';
+import { Menu } from 'antd';
+import React from 'react';
+import { Link } from 'react-router-dom';
+const items = [
+  {
+    key: '1',
+    icon: <HomeOutlined />,
+    title: 'Home',
+    label: (
+      <>
+        <Link to={'/inicio'}>Inicio</Link>{' '}
+      </>
+    ),
+  },
+  // {
+  //   key: '2',
+  //   icon: <UserOutlined />,
+  //   title: 'Usuarios',
+  //   label: (
+  //     <>
+  //       <Link to={'/usuarios'}>Usuarios</Link>{' '}
+  //     </>
+  //   ),
+  // },
+  {
+    key: '3',
+    icon: <MenuOutlined />,
+    title: 'Proyectos',
+    label: (
+      <>
+        <Link to={'/Proyectos'}>Proyectos</Link>{' '}
+      </>
+    ),
+  },
+  {
+    key: '4',
+    icon: <FileAddOutlined />,
+    title: 'Archivo Ex',
+    label: (
+      <>
+        <Link to={'/Subir'}>Archivo Ex</Link>{' '}
+      </>
+    ),
+  },
+  {
+    key: '5',
+    icon: <FileAddOutlined />,
+    title: 'Un Proyecto',
+    label: (
+      <>
+        <Link to={'/Proyectos/1/Proyecto'}>Un Proyecto</Link>{' '}
+      </>
+    ),
+  },
+  {
+    key: '6',
+    icon: <LinkOutlined />,
+    title: 'Referencia',
+    label: (
+      <>
+        <Link to={'/referencia'}>Referencia</Link>{' '}
+      </>
+    ),
+  },
+  {
+    key: '7',
+    icon: <UserOutlined />,
+    title: 'Miembros',
+    label: (
+      <>
+        <Link to={'/Miembros'}>Miembros</Link>{' '}
+      </>
+    ),
+  },
+];
+
+const MenuSider = () => {
+  return <Menu items={items} />;
+};
+
+export default MenuSider;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\layouts\components\Navbar.jsx
+import React from 'react';
+import {
+  HomeOutlined,
+  UserOutlined,
+  MenuOutlined,
+  FileAddOutlined,
+  LinkOutlined,
+} from '@ant-design/icons';
+import { Menu } from 'antd';
+import { Link } from 'react-router-dom';
+
+const items = [
+  {
+    key: '1',
+    icon: <HomeOutlined style={{ fontSize: '16pt' }} />,
+    title: 'Home',
+    label: (
+      <Link to={'/inicio'} style={{ color: '#FFFFFF' }}>
+        Inicio
+      </Link>
+    ),
+  },
+  {
+    key: '3',
+    icon: <MenuOutlined style={{ fontSize: '16pt' }} />,
+    title: 'Proyectos',
+    label: (
+      <Link to={'/Proyectos'} style={{ color: '#FFFFFF' }}>
+        Proyectos
+      </Link>
+    ),
+  },
+  {
+    key: '4',
+    icon: <FileAddOutlined style={{ fontSize: '16pt' }} />,
+    title: 'Archivo Ex',
+    label: (
+      <Link to={'/Subir'} style={{ color: '#FFFFFF' }}>
+        Archivo Ex
+      </Link>
+    ),
+  },
+  {
+    key: '5',
+    icon: <FileAddOutlined style={{ fontSize: '16pt' }} />,
+    title: 'Un Proyecto',
+    label: (
+      <Link to={'/Proyectos/1/Proyecto'} style={{ color: '#FFFFFF' }}>
+        Un Proyecto
+      </Link>
+    ),
+  },
+  {
+    key: '6',
+    icon: <LinkOutlined style={{ fontSize: '16pt' }} />,
+    title: 'Referencia',
+    label: (
+      <Link to={'/referencia'} style={{ color: '#FFFFFF' }}>
+        Referencia
+      </Link>
+    ),
+  },
+  {
+    key: '7',
+    icon: <UserOutlined style={{ fontSize: '16pt' }} />,
+    title: 'Miembros',
+    label: (
+      <Link to={'/Miembros'} style={{ color: '#FFFFFF' }}>
+        Miembros
+      </Link>
+    ),
+  },
+];
+
+const Navbar = () => {
+  return (
+    <div style={{ width: '100%' }} className="mt-0 md:mt-2">
+      <Menu
+        mode="horizontal"
+        items={items}
+        theme="dark"
+        // Agregar borde para esquinas de abajo con tailwindcss
+        className=" rounded-b-md md:rounded-md"
+        // className=" rounded-s-sm md:rounded-md"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          width: '100%',
+          backgroundColor: '#c23633',
+          fontSize: '16pt',
+          // borderRadius: '0.375rem',
+        }}
+      />
+    </div>
+  );
+};
+
+export default Navbar;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Home.jsx
+import React from 'react';
+
+const Home = () => {
+  return <div>Home</div>;
+};
+
+export default Home;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Inicio.jsx
+import { Card, Button, Row, Col, Pagination } from 'antd';
+import React, { useState, useEffect } from 'react';
+import project1Image from '../images/test.jpg';
+import project1Image2 from '../images/image-1@2x.png';
+import { useNavigate } from 'react-router-dom';
+
+const projects = [
+  { id: 1, title: 'Proyecto 1', image: project1Image },
+  { id: 2, title: 'Proyecto 2', image: project1Image2 },
+  { id: 3, title: 'Proyecto 3', image: project1Image },
+  { id: 4, title: 'Proyecto 4', image: project1Image2 },
+  { id: 5, title: 'Proyecto 5', image: project1Image },
+  { id: 6, title: 'Proyecto 6', image: project1Image2 },
+  { id: 7, title: 'Proyecto 7', image: project1Image },
+  { id: 8, title: 'Proyecto 8', image: project1Image2 },
+  { id: 9, title: 'Proyecto 9', image: project1Image },
+  { id: 10, title: 'Proyecto 10', image: project1Image2 },
+  { id: 11, title: 'Proyecto 11', image: project1Image },
+  { id: 12, title: 'Proyecto 12', image: project1Image2 },
+  { id: 13, title: 'Proyecto 13', image: project1Image },
+  { id: 14, title: 'Proyecto 14', image: project1Image2 },
+  { id: 15, title: 'Proyecto 15', image: project1Image },
+  { id: 16, title: 'Proyecto 16', image: project1Image2 },
+  { id: 17, title: 'Proyecto 17', image: project1Image },
+  { id: 18, title: 'Proyecto 18', image: project1Image2 },
+  { id: 19, title: 'Proyecto 19', image: project1Image },
+  { id: 20, title: 'Proyecto 20', image: project1Image2 },
+  { id: 21, title: 'Proyecto 21', image: project1Image },
+  { id: 22, title: 'Proyecto 22', image: project1Image2 },
+  { id: 23, title: 'Proyecto 23', image: project1Image },
+  { id: 24, title: 'Proyecto 24', image: project1Image2 },
+  { id: 25, title: 'Proyecto 25', image: project1Image },
+  { id: 26, title: 'Proyecto 26', image: project1Image2 },
+  { id: 27, title: 'Proyecto 27', image: project1Image },
+];
+
+const PAGE_SIZE = 8; // Number of cards per page
+
+const Inicio = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [transitioning, setTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (transitioning) {
+      const timer = setTimeout(() => setTransitioning(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [transitioning]);
+
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handlePageChange = (page) => {
+    setTransitioning(true);
+    setTimeout(() => {
+      setCurrentPage(page);
+    }, 300); // Duration of the transition animation
+  };
+
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const currentProjects = projects.slice(startIndex, startIndex + PAGE_SIZE);
+
+  return (
+    <div>
+      <Row
+        justify="center"
+        gutter={[16, 16]}
+        style={{ marginTop: '20px', marginBottom: '20px' }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            opacity: transitioning ? 0 : 1,
+            transition: 'opacity 0.3s ease-in-out',
+            width: '100%',
+            justifyContent: 'center',
+          }}
+        >
+          {currentProjects.map((project) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={project.id}>
+              <Card
+                onClick={() => navigate(`/Proyectos/${project.id}/Proyecto`)}
+                hoverable
+                style={{ marginBottom: '30px' }} // Add margin bottom to increase vertical spacing
+                cover={
+                  <img
+                    alt={project.title}
+                    src={project.image}
+                    style={{
+                      backgroundColor: '#f5f5f5',
+                      height: '200px',
+                      objectFit: 'cover',
+                      width: '100%',
+                    }}
+                  />
+                }
+              >
+                <Button disabled shape="round" style={{ marginBottom: '10px' }}>
+                  #Arquitectura
+                </Button>
+                <Button disabled shape="round" style={{ marginLeft: '10px' }}>
+                  #Infraestructura
+                </Button>
+                <Card.Meta
+                  title={
+                    <div style={{ fontSize: '120%', marginTop: '10px' }}>
+                      {project.title}
+                    </div>
+                  }
+                />
+              </Card>
+            </Col>
+          ))}
+        </div>
+      </Row>
+      <Row justify="center" style={{ marginTop: '20px' }}>
+        <Pagination
+          current={currentPage}
+          pageSize={PAGE_SIZE}
+          total={projects.length}
+          onChange={handlePageChange}
+        />
+      </Row>
+    </div>
+  );
+};
+
+export default Inicio;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Login.jsx
+import PropTypes from 'prop-types';
+import React from 'react';
+import { Form, Input, Button, Typography } from 'antd';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import backgroundImage from '../images/image-1@2x.png'; // Import the image
+
+const { Title } = Typography;
+
+export const Login = ({ className, buttonText = 'Login' }) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const onFinish = (values) => {
+    console.log('Success:', values);
+    navigate('/inicio'); // Redirect to another page using useNavigate
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  return (
+    <div
+      className="login-container  h-screen"
+      style={{
+        ...styles.container,
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(${backgroundImage})`,
+      }}
+    >
+      <div className={`login-form ${className}`} style={styles.form}>
+        <Title level={2} className="login-title" style={styles.title}>
+          ArquiUDP
+        </Title>
+        <Form
+          name="login"
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          layout="vertical" // Set form layout to 'vertical'
+        >
+          <Form.Item
+            label="Mail UDP"
+            name="username"
+            rules={[{ required: true, message: 'Porfavor Ingrese su Correo' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="ContraseÃ±a"
+            name="password"
+            rules={[
+              { required: true, message: 'Porfavor Ingrese su ContraseÃ±a' },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="login-button"
+              style={{
+                ...styles.button,
+                backgroundColor: 'white',
+                borderColor: '#c23633',
+                color: '#c23633',
+                borderWidth: '2px',
+                fontWeight: 'bold',
+              }}
+            >
+              {buttonText}
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </div>
+  );
+};
+
+Login.propTypes = {
+  className: PropTypes.string,
+  buttonText: 'Iniciar SesiÃ³n',
+};
+
+Login.defaultProps = {
+  className: '',
+  buttonText: 'Iniciar SesiÃ³n',
+};
+
+const styles = {
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // height: '100vh',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  },
+  form: {
+    position: 'relative', // Set position to relative
+    zIndex: 1, // Set z-index to 1 to ensure form appears above overlay
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: '2rem',
+    borderRadius: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    width: '300px',
+    textAlign: 'center',
+    borderColor: '#c23633',
+  },
+  title: {
+    marginBottom: '1rem',
+    color: '#c23633',
+  },
+  button: {
+    width: '100%',
+  },
+};
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Miembros.jsx
+import React, { useState } from 'react';
+import { Avatar, Row, Col, Modal, Input, Button } from 'antd';
+import { UserAddOutlined, UserOutlined } from '@ant-design/icons';
+
+const UserCard = ({ name, isInvite, onInviteClick }) => (
+  <Col
+    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+  >
+    <div
+      style={{ textAlign: 'center', margin: '15px' }}
+      onClick={isInvite ? onInviteClick : null}
+    >
+      {isInvite ? (
+        <Avatar
+          className="w-full h-full p-10"
+          // size={400}
+          icon={
+            <UserAddOutlined style={{ fontSize: '100px', color: '#b22222' }} />
+          }
+          style={{ backgroundColor: '#f0f0f0', cursor: 'pointer' }}
+        />
+      ) : (
+        <Avatar
+          className="w-full h-full p-10"
+          style={{ backgroundColor: '#d9d9d9' }}
+        >
+          <UserOutlined style={{ fontSize: '100px' }} />
+        </Avatar>
+      )}
+      <div style={{ marginTop: '10px', fontWeight: 'bold', fontSize: '18px' }}>
+        {name}
+      </div>
+    </div>
+  </Col>
+);
+
+const Miembros = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleOk = () => {
+    // Logica de la invitacion // agregar la wea de los mails
+    setIsModalVisible(false);
+  };
+
+  return (
+    <div style={{ padding: '50px 20px', backgroundColor: '#fafafa' }}>
+      <Row justify="space-around" align="middle">
+        <UserCard name="Nombre usuario" isInvite={false} />
+        <UserCard name="Nombre usuario" isInvite={false} />
+        <UserCard
+          name="Invitar Usuario"
+          isInvite={true}
+          onInviteClick={showModal}
+        />
+      </Row>
+      <Modal
+        title="Invitar Usuario"
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Input
+          placeholder="Correo de invitaciÃ³n"
+          style={{ marginBottom: '10px' }}
+        />
+        <Button
+          type="primary"
+          block
+          style={{ marginBottom: '10px' }}
+          onClick={handleOk}
+        >
+          Enviar Invitacion
+        </Button>
+        <Button block>Copiar Link de InvitaciÃ³n</Button>
+      </Modal>
+    </div>
+  );
+};
+
+export default Miembros;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Proyecto.jsx
+import React, { useState } from 'react';
+import { Avatar, Card, Modal, Tag, Typography } from 'antd';
+import ScrollableContainer from '../components/ScrollableList';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import UploadFile from '../components/UploadFile';
+const { Title } = Typography;
+
+const placeholderUserImage =
+  'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+const placeholderFileImage =
+  'https://www.iconpacks.net/icons/2/free-file-icon-1453-thumb.png';
+const placeholderProyectImage =
+  'https://static.dezeen.com/uploads/2022/07/sq-university-of-oregon-schoolshows_dezeen_2364_col_0.jpg';
+
+const Proyecto = () => {
+  const archivos = [
+    { name: 'Archivo 1', fileSize: '2 MB' },
+    { name: 'Archivo 2', fileSize: '1.5 MB' },
+    { name: 'Archivo 3', fileSize: '3.2 MB' },
+    { name: 'Archivo 4', fileSize: '700 KB' },
+  ];
+  const miembros = ['Miembro 1', 'Miembro 2', 'Miembro 3', 'Miembro 4'];
+  const referentes = [
+    'Referente 1',
+    'Referente 2',
+    'Referente 3',
+    'Referente 4',
+  ];
+  const tags = ['Tag 1', 'Tag 2', 'Tag 3', 'Tag 4', 'Tag 5', 'Tag 2'];
+
+  const renderArchivo = (archivo, index) => (
+    <div
+      key={index}
+      className="flex items-center bg-gray-200 p-2 mb-2 rounded-lg cursor-pointer"
+      onClick={() => alert(`Downloading ${archivo.name}`)} // Add your download logic here
+    >
+      <img
+        src={placeholderFileImage}
+        alt="Archivo adjunto"
+        draggable="false"
+        style={{
+          width: '40px',
+          height: '40px',
+          objectFit: 'cover',
+          borderRadius: '8px',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          marginRight: '10px',
+        }}
+      />
+      <div>
+        <p style={{ fontSize: '14px', margin: 0 }}>{archivo.name}</p>
+        <p style={{ fontSize: '12px', color: 'gray', margin: 0 }}>
+          {archivo.fileSize}
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderMiembro = (miembro, index) => (
+    <div key={index} className="flex flex-col items-center ">
+      <Avatar size={64} className="bg-gray-300" src={placeholderUserImage} />
+      <p>{miembro}</p>
+    </div>
+  );
+
+  const renderReferente = (referente, index) => (
+    <Card
+      key={index}
+      className="min-w-[120px] min-h-[120px] flex-shrink-0 bg-gray-300"
+    >
+      {/* {referente} */}
+    </Card>
+  );
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const handleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const renderTag = (tag, index) => (
+    <Tag key={index} color="blue">
+      {tag}
+    </Tag>
+  );
+
+  return (
+    <>
+      <Modal open={isModalVisible} onCancel={handleModal} width={'80%'}>
+        <UploadFile />
+      </Modal>
+      <div className="p-8">
+        <div className="flex flex-col lg:flex-row justify-around mb-8">
+          <div className="flex flex-col items-center lg:items-start mb-8 lg:mb-0 w-full lg:w-auto">
+            <Title level={3} className="text-center lg:text-left">
+              Nombre Proyecto
+            </Title>
+            <p className="text-center lg:text-left">16/06/2024</p>
+            <Title level={4} className="mb-2 text-center lg:text-left">
+              Imagen Opcional
+            </Title>
+            <div className="w-full lg:w-[500px] h-[500px]">
+              <img
+                src={placeholderProyectImage}
+                alt="Imagen del proyecto"
+                className="w-full h-full bg-gray-300 rounded-lg"
+              />
+              <ScrollableContainer
+                items={tags}
+                renderItem={renderTag}
+                maxVisibleItems={5}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col items-start w-full lg:w-auto">
+            <div className="flex flex-row justify-start text-center mb-2">
+              <Title level={4} className="text-center lg:text-left mt-3">
+                Archivos
+              </Title>
+              <PlusCircleOutlined
+                className="ml-2"
+                size={20}
+                onClick={handleModal}
+              />
+            </div>
+            <div className="w-full">
+              {archivos.map((archivo, index) => renderArchivo(archivo, index))}
+            </div>
+            <Title level={4} className="mt-8 text-center lg:text-left">
+              Miembros
+            </Title>
+            <ScrollableContainer
+              items={miembros}
+              renderItem={renderMiembro}
+              maxVisibleItems={4}
+            />
+            <Title level={4} className="mt-8 text-center lg:text-left">
+              Referentes
+            </Title>
+            <ScrollableContainer
+              items={referentes}
+              renderItem={renderReferente}
+              maxVisibleItems={3}
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Proyecto;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Proyectos.jsx
+import { Card, Table } from 'antd';
+import {
+  SearchOutlined,
+  FileAddOutlined,
+  FileImageOutlined,
+} from '@ant-design/icons';
+import {
+  Button,
+  Divider,
+  Flex,
+  Radio,
+  Space,
+  Tooltip,
+  Row,
+  Col,
+  Modal,
+  Input,
+} from 'antd';
+import React, { useState } from 'react';
+import project1Image from '../images/image.png';
+import { useNavigate } from 'react-router-dom';
+
+const projects = [
+  { id: 1, title: 'Proyecto 1', image: project1Image },
+  { id: 2, title: 'Proyecto 2', image: project1Image },
+  { id: 3, title: 'Proyecto 3', image: project1Image },
+  { id: 4, title: 'Proyecto 4', image: project1Image },
+  { id: 5, title: 'Proyecto 5', image: project1Image },
+  { id: 6, title: 'Proyecto 6', image: project1Image },
+  { id: 7, title: 'Proyecto 7', image: project1Image },
+  { id: 8, title: 'Proyecto 8', image: project1Image },
+  { id: 9, title: 'Proyecto 9', image: project1Image },
+  { id: 10, title: 'Proyecto 10', image: project1Image },
+  { id: 11, title: 'Proyecto 11', image: project1Image },
+  { id: 12, title: 'Proyecto 12', image: project1Image },
+  { id: 13, title: 'Proyecto 13', image: project1Image },
+  { id: 14, title: 'Proyecto 14', image: project1Image },
+  { id: 15, title: 'Proyecto 15', image: project1Image },
+  { id: 16, title: 'Proyecto 16', image: project1Image },
+  { id: 17, title: 'Proyecto 17', image: project1Image },
+  { id: 18, title: 'Proyecto 18', image: project1Image },
+  { id: 19, title: 'Proyecto 19', image: project1Image },
+  { id: 20, title: 'Proyecto 20', image: project1Image },
+  { id: 21, title: 'Proyecto 21', image: project1Image },
+  { id: 22, title: 'Proyecto 22', image: project1Image },
+  { id: 23, title: 'Proyecto 23', image: project1Image },
+  { id: 24, title: 'Proyecto 24', image: project1Image },
+  { id: 25, title: 'Proyecto 25', image: project1Image },
+  { id: 26, title: 'Proyecto 26', image: project1Image },
+  { id: 27, title: 'Proyecto 27', image: project1Image },
+];
+
+const Proyectos = () => {
+  const [position, setPosition] = useState('end');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  return (
+    <div>
+      <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+        <Row justify="center" gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={8} lg={6} style={{ textAlign: 'center' }}>
+            <Button
+              type="primary"
+              style={{ width: '80px', height: '40px' }}
+              icon={<SearchOutlined style={{ fontSize: '30px' }} />}
+              iconPosition={position}
+              shape="round"
+            ></Button>
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={6} style={{ textAlign: 'center' }}>
+            <Button
+              disabled
+              style={{
+                border: '1px solid #d9d9d9',
+                backgroundColor: '#f5f5f5',
+                color: '#999',
+                cursor: 'not-allowed',
+                height: '40px',
+                fontSize: '18px',
+              }}
+              shape="round"
+            >
+              #Arquitectura
+            </Button>
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={6} style={{ textAlign: 'center' }}>
+            <Button
+              disabled
+              style={{
+                border: '1px solid #d9d9d9',
+                backgroundColor: '#f5f5f5',
+                color: '#999',
+                cursor: 'not-allowed',
+                height: '40px',
+                fontSize: '18px',
+              }}
+              shape="round"
+            >
+              #Infraestructura
+            </Button>
+          </Col>
+        </Row>
+      </div>
+      <Row justify="center" style={{ marginTop: '20px' }}>
+        <Col span={24} style={{ textAlign: 'center' }}>
+          <Button
+            shape="round"
+            type="primary"
+            icon={<FileAddOutlined />}
+            iconPosition={position}
+            onClick={showModal}
+            style={{ width: '300px', height: '40px', fontSize: '18px' }} // Ajusta el ancho segÃºn sea necesario
+          >
+            Crear un Nuevo Proyecto
+          </Button>
+        </Col>
+      </Row>
+      <Modal
+        style={{ marginTop: '200px' }}
+        visible={isModalVisible}
+        footer={null}
+        onCancel={handleCancel}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}
+        >
+          <Input
+            shape="round"
+            placeholder="Nombre del Proyecto"
+            style={{
+              marginBottom: '5px',
+              width: '300px',
+              borderRadius: '25px',
+              height: '40px',
+            }}
+          />
+          <Button
+            shape="round"
+            type="primary"
+            icon={<FileImageOutlined />}
+            iconPosition={position}
+            onClick={showModal}
+            style={{ width: '300px', height: '40px', fontSize: '18px' }}
+          >
+            Imagen de previsualizaciÃ³n
+          </Button>
+          <Button
+            shape="round"
+            type="primary"
+            icon={<FileAddOutlined />}
+            iconPosition={position}
+            onClick={showModal}
+            style={{
+              width: '250px',
+              height: '40px',
+              fontSize: '18px',
+              marginTop: '20px',
+            }}
+          >
+            Crear Proyecto
+          </Button>
+        </div>
+      </Modal>
+
+      <Row justify="center" gutter={[16, 16]} style={{ marginTop: '20px' }}>
+        {projects.map((project) => (
+          <Col xs={24} sm={12} md={8} lg={6} key={project.id}>
+            <Card
+              onClick={() => navigate(`/Proyectos/${project.id}/Proyecto`)}
+              hoverable
+              cover={
+                <img
+                  alt={project.title}
+                  src={project.image}
+                  style={{
+                    backgroundColor: '#f5f5f5',
+                    height: '400px',
+                    objectFit: 'cover',
+                    width: '100%',
+                  }}
+                />
+              }
+            >
+              <Button disabled shape="round" style={{ marginBottom: '10px' }}>
+                #Arquitectura
+              </Button>
+              <Button disabled shape="round" style={{ marginLeft: '10px' }}>
+                #Infraestructura
+              </Button>
+              <Card.Meta
+                title={
+                  <div style={{ fontSize: '150%', marginTop: '10px' }}>
+                    {project.title}
+                  </div>
+                }
+              />
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  );
+};
+
+export default Proyectos;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Referencia.jsx
+import React from 'react';
+import { Row, Col, Typography } from 'antd';
+import image from '../images/test2.jpg';
+
+const { Title, Paragraph } = Typography;
+
+const Referencia = () => {
+  // const styles = {
+  //   container: {
+  //     width: '1300px', // Fixed width (1200px)
+  //     height: '505px', // Fixed height (505px)
+  //     padding: '30px 0 0 0', // Padding: 30px top, 0 right, 0 bottom, 0 left
+  //     gap: '30px', // Gap between items in the Row
+  //     opacity: '0.8', // Opacity
+  //     margin: '0 auto', // Center content horizontally
+  //     display: 'flex',
+  //     flexDirection: 'column',
+  //     justifyContent: 'center',
+  //     alignItems: 'center',
+  //   },
+  //   imageContainer: {
+  //     width: '100%',
+  //     height: '100%',
+  //     position: 'relative',
+  //     borderRadius: '10px', // Rounded corners
+  //     overflow: 'hidden', // Ensure rounded corners are applied
+  //     marginBottom: '20px', // Increase margin bottom to create space between image and text
+  //   },
+  //   bigImage: {
+  //     width: '100%',
+  //     height: '100%',
+  //     objectFit: 'cover',
+  //   },
+  //   textContainer: {
+  //     width: '100%', // Full width of the column
+  //   },
+  //   title: {
+  //     marginTop: '20px', // Margin top reduced for better alignment
+  //     fontWeight: 'bold', // Make titles bold
+  //   },
+  //   subtitle: {
+  //     marginTop: '10px', // Margin top for subtitle
+  //     color: '#888', // Subtitle color
+  //   },
+  //   paragraph: {
+  //     fontSize: '16px', // Font size for paragraph text
+  //     lineHeight: '1.5', // Line height for better readability
+  //   },
+  // };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-screen">
+      <Row gutter={[50, 20]} style={{ height: '100%', width: '100%' }}>
+        <Col xs={24} md={9}>
+          <div>
+            <img className="w-full h-full" src={image} alt="Big Square" />
+          </div>
+          <Title level={3}>Titulo de la Referencia</Title>
+          <Title level={5}>Autor de la Referencia</Title>
+        </Col>
+        <Col xs={24} md={15}>
+          <div>
+            <Title level={3}>Apuntes</Title>
+            <Paragraph>
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+              reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+              sunt in culpa qui officia deserunt mollit anim id est laborum."
+            </Paragraph>
+          </div>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+export default Referencia;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Subir.jsx
+import React, { useState } from 'react';
+
+import UploadFile from '../components/UploadFile';
+
+const Miembros = () => {
+  return (
+    <>
+      <UploadFile />
+    </>
+  );
+};
+
+export default Miembros;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\pages\Usuarios.jsx
+import { Card, Table } from 'antd';
+import React from 'react';
+
+const Usuarios = () => {
+  return (
+    <div>
+      <Card>Hola</Card>
+      <Table></Table>
+    </div>
+  );
+};
+
+export default Usuarios;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\routes\index.jsx
+import MainLayout from '../layouts/MainLayout';
+import MainLayoutTop from '../layouts/MainLayoutTop';
+import Home from '../pages/Home';
+import Usuarios from '../pages/Usuarios';
+import Proyectos from '../pages/Proyectos';
+import Miembros from '../pages/Miembros';
+import { Login } from '../pages/Login';
+import Inicio from '../pages/Inicio';
+import Proyecto from '../pages/Proyecto';
+import Subir from '../pages/Subir';
+import Referencia from '../pages/Referencia';
+import EmptyLayout from '../layouts/EmptyLayout';
+
+const routes = [
+  {
+    path: '/',
+    layout: EmptyLayout,
+    element: Login,
+  },
+  {
+    path: '/usuarios',
+    layout: MainLayoutTop,
+    element: Usuarios,
+  },
+  {
+    path: '/Proyectos',
+    layout: MainLayoutTop,
+    element: Proyectos,
+  },
+  {
+    path: '/Proyectos/:id/Proyecto',
+    layout: MainLayoutTop,
+    element: Proyecto,
+  },
+  {
+    path: '/Miembros',
+    layout: MainLayoutTop,
+    element: Miembros,
+  },
+  {
+    path: '/login',
+    layout: EmptyLayout,
+    element: Login,
+  },
+  {
+    path: '/inicio',
+    layout: MainLayoutTop,
+    element: Inicio,
+  },
+  {
+    path: '/Subir',
+    layout: MainLayoutTop,
+    element: Subir,
+  },
+  {
+    path: '/referencia',
+    layout: MainLayoutTop,
+    element: Referencia,
+  },
+  {
+    path: '/Subir',
+    layout: MainLayout,
+    element: Subir,
+  },
+];
+
+export default routes;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\theme\antdTheme.js
+import { primaryColor, dangerColor } from './colors';
+
+const { ConfigProvider } = require('antd');
+// import esES from 'antd/es/locale/es_ES';
+
+const whitTheme = (node) => (
+  <>
+    <ConfigProvider
+      //   locale={esES}
+      theme={{
+        // algorithm: theme.defaultAlgorithm,
+        token: {
+          colorPrimary: dangerColor,
+        },
+        components: {
+          Layout: {
+            headerBg: 'transparent',
+            triggerBg: dangerColor,
+            siderBg: '#fff',
+            headerPadding: '0',
+          },
+          Menu: {
+            itemColor: dangerColor,
+            itemBorderRadius: '0.375rem',
+          },
+          Button: {
+            dangerColor: dangerColor,
+            borderRadius: '0.375rem',
+          },
+          Input: {
+            borderRadius: '0.375rem',
+          },
+          InputNumber: {
+            borderRadius: '0.375rem',
+          },
+          Select: {
+            borderRadius: '0.375rem',
+          },
+          DatePicker: {
+            borderRadius: '0.375rem',
+          },
+        },
+      }}
+    >
+      <ConfigProvider
+        theme={{
+          token: {
+            borderRadius: 16,
+          },
+        }}
+      >
+        {node}
+      </ConfigProvider>
+    </ConfigProvider>
+  </>
+);
+
+export default whitTheme;
+
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\theme\colors.js
+export const primaryColor = '#0055b3';
+export const dangerColor = '#E54441';
+
+#### file: C:\Users\Mateo\OneDrive\Escritorio\apuntes-udp-front\src\theme\tailwindcss.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
