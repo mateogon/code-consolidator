@@ -9,8 +9,26 @@ def parse_ignore_file(repo_path):
     gitignore_path = repo_path / '.gitignore'
     return parse_gitignore(gitignore_path) if gitignore_path.exists() else (lambda s: False)
 
+# Helper function to determine if a file should be skipped
+def is_skippable_file(filename):
+    # Define a set of skippable file patterns or exact names
+    skippable_files = {
+        '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.ico',  # image files
+        'package-lock.json'  # auto-generated large files
+    }
+    # Check if the file name exactly matches any skippable files
+    if filename in skippable_files:
+        return True
+    # Check if the file ends with any skippable extensions
+    return any(filename.endswith(ext) for ext in skippable_files if ext.startswith('.'))
+
 def filter_files(files, matcher, file_list=None):
-    return [f for f in files if not matcher(str(f)) and '.git' not in str(f) and (file_list is None or str(f) in file_list)]
+    # Update this to include skippable file check
+    return [f for f in files if not matcher(str(f))
+            and '.git' not in str(f)
+            and not is_skippable_file(f.name)
+            and (file_list is None or str(f) in file_list)]
+
 
 def filter_dirs(dirs, matcher, root):
     return [d for d in dirs if not matcher(os.path.join(root, d)) and '.git' not in d]
