@@ -1,2 +1,4 @@
 *.txt
+combined_files.txt
 .git/
+venv/
