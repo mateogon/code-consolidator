@@ -20,24 +20,33 @@ def is_image(file_path):
     ]
     return any(file_path.lower().endswith(ext) for ext in image_extensions)
 
-def ignore(file_path):
-    """
-    Determines if a file should be ignored due to its type or extension.
-    """
-    ignored_extensions = [
-        '.pyc', '.so', '.dll', '.exe', '.class', '.o', 
-        '.a', '.lib', '.dylib', '.bin', '.obj', 
-        '.webp'  # Added here for redundancy
-    ]
-    return any(file_path.lower().endswith(ext) for ext in ignored_extensions)
+# Helper function to determine if a file or directory should be skipped
+def is_skippable_file(filename):
+    # Define a set of skippable file patterns or exact names
+    skippable_files = {
+        '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.ico',  # image files
+        '.pyc', '.pyo',  # Python cache files
+        '.db', '.sqlite', '.sqlite3',  # Database files
+        'package-lock.json'  # auto-generated large files
+    }
+    # Check if the file name exactly matches any skippable files
+    if filename in skippable_files:
+        return True
+    # Check if the file ends with any skippable extensions or directory names
+    return any(filename.endswith(ext) for ext in skippable_files if ext.startswith('.'))
+
+def filter_files(files, matcher, file_list=None):
+    # Update this to include skippable file check
+    return [f for f in files if not matcher(str(f))
+            and '.git' not in str(f)
+            and not is_skippable_file(f.name)
+            and (file_list is None or str(f) in file_list)]
 
 def filter_dirs(dirs, matcher, root):
-    filtered_dirs = []
-    for d in dirs:
-        dir_path = str(Path(root) / d).replace("\\", "/")  # Normalize path
-        if not matcher(dir_path) and '.git' not in dir_path:
-            filtered_dirs.append(d)
-    return filtered_dirs
+    # Exclude __pycache__ directories directly
+    return [d for d in dirs if not matcher(os.path.join(root, d))
+            and '.git' not in d
+            and d != '__pycache__']
 
 def filter_files(files, matcher, file_set=None):
     filtered_files = []
